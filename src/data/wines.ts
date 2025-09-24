@@ -1,0 +1,225 @@
+import { Wine } from '../types';
+
+export const wines: Wine[] = [
+  // Champagne
+  {
+    id: '1',
+    name: 'Dom Pérignon Vintage 2012',
+    category: 'champagne',
+    price: 299.99,
+    rating: 4.9,
+    reviews: 142,
+    image: 'https://images.pexels.com/photos/5531259/pexels-photo-5531259.jpeg?auto=compress&cs=tinysrgb&w=500',
+    description: 'The pinnacle of champagne craftsmanship. Elegant bubbles with notes of citrus, brioche, and mineral complexity.',
+    vintage: 2012,
+    region: 'Champagne, France',
+    alcoholContent: 12.5,
+    volume: '750ml',
+    inStock: true,
+    featured: true
+  },
+  {
+    id: '2',
+    name: 'Moët & Chandon Brut Imperial',
+    category: 'champagne',
+    price: 89.99,
+    rating: 4.6,
+    reviews: 203,
+    image: 'https://images.pexels.com/photos/6478797/pexels-photo-6478797.jpeg?auto=compress&cs=tinysrgb&w=500',
+    description: 'Classic champagne with vibrant effervescence and fresh fruit flavors. Perfect for celebrations.',
+    vintage: 2020,
+    region: 'Champagne, France',
+    alcoholContent: 12.0,
+    volume: '750ml',
+    inStock: true
+  },
+
+  // Cognac
+  {
+    id: '3',
+    name: 'Hennessy XO',
+    category: 'cognac',
+    price: 249.99,
+    originalPrice: 299.99,
+    rating: 4.8,
+    reviews: 156,
+    image: 'https://images.pexels.com/photos/5490968/pexels-photo-5490968.jpeg?auto=compress&cs=tinysrgb&w=500',
+    description: 'Premium cognac with rich, complex flavors of dried fruits, spices, and oak. Aged to perfection.',
+    region: 'Cognac, France',
+    alcoholContent: 40.0,
+    volume: '700ml',
+    inStock: true,
+    featured: true
+  },
+  {
+    id: '4',
+    name: 'Rémy Martin VSOP',
+    category: 'cognac',
+    price: 89.99,
+    rating: 4.5,
+    reviews: 94,
+    image: 'https://images.pexels.com/photos/4553618/pexels-photo-4553618.jpeg?auto=compress&cs=tinysrgb&w=500',
+    description: 'Smooth and balanced cognac with notes of vanilla, apricot, and honey. Perfect for sipping.',
+    region: 'Cognac, France',
+    alcoholContent: 40.0,
+    volume: '700ml',
+    inStock: true
+  },
+
+  // Spirits
+  {
+    id: '5',
+    name: 'Grey Goose Vodka',
+    category: 'spirits',
+    price: 59.99,
+    rating: 4.7,
+    reviews: 287,
+    image: 'https://images.pexels.com/photos/3672825/pexels-photo-3672825.jpeg?auto=compress&cs=tinysrgb&w=500',
+    description: 'Premium French vodka with exceptional smoothness and purity. Distilled from French wheat.',
+    region: 'France',
+    alcoholContent: 40.0,
+    volume: '750ml',
+    inStock: true
+  },
+  {
+    id: '6',
+    name: 'Bombay Sapphire Gin',
+    category: 'spirits',
+    price: 39.99,
+    rating: 4.4,
+    reviews: 198,
+    image: 'https://images.pexels.com/photos/5490966/pexels-photo-5490966.jpeg?auto=compress&cs=tinysrgb&w=500',
+    description: 'London Dry Gin with 10 hand-selected botanicals. Crisp, clean, and perfectly balanced.',
+    region: 'England',
+    alcoholContent: 40.0,
+    volume: '750ml',
+    inStock: true
+  },
+
+  // Whisky
+  {
+    id: '7',
+    name: 'Macallan 18 Year Old',
+    category: 'whisky',
+    price: 599.99,
+    rating: 4.9,
+    reviews: 89,
+    image: 'https://images.pexels.com/photos/3672825/pexels-photo-3672825.jpeg?auto=compress&cs=tinysrgb&w=500',
+    description: 'Exceptional single malt Scotch whisky aged in sherry oak casks. Rich, complex, and luxurious.',
+    region: 'Speyside, Scotland',
+    alcoholContent: 43.0,
+    volume: '700ml',
+    inStock: true,
+    featured: true
+  },
+  {
+    id: '8',
+    name: 'Jameson Irish Whiskey',
+    category: 'whisky',
+    price: 34.99,
+    rating: 4.3,
+    reviews: 245,
+    image: 'https://images.pexels.com/photos/4553618/pexels-photo-4553618.jpeg?auto=compress&cs=tinysrgb&w=500',
+    description: 'Smooth Irish whiskey with notes of vanilla, honey, and spice. Triple distilled for exceptional smoothness.',
+    region: 'Ireland',
+    alcoholContent: 40.0,
+    volume: '750ml',
+    inStock: true
+  },
+
+  // Wine
+  {
+    id: '9',
+    name: 'Château Margaux 2018',
+    category: 'wine',
+    subcategory: 'red',
+    price: 899.99,
+    originalPrice: 1199.99,
+    rating: 4.9,
+    reviews: 142,
+    image: 'https://images.pexels.com/photos/3672825/pexels-photo-3672825.jpeg?auto=compress&cs=tinysrgb&w=500',
+    description: 'An exceptional vintage from one of Bordeaux\'s most prestigious estates. Rich, complex, with notes of blackcurrant, cedar, and tobacco.',
+    vintage: 2018,
+    region: 'Bordeaux, France',
+    alcoholContent: 13.5,
+    volume: '750ml',
+    inStock: true,
+    featured: true
+  },
+  {
+    id: '10',
+    name: 'Cloudy Bay Sauvignon Blanc',
+    category: 'wine',
+    subcategory: 'white',
+    price: 32.99,
+    rating: 4.6,
+    reviews: 203,
+    image: 'https://images.pexels.com/photos/5490966/pexels-photo-5490966.jpeg?auto=compress&cs=tinysrgb&w=500',
+    description: 'Crisp and refreshing New Zealand Sauvignon Blanc with tropical fruit flavors and a zesty finish.',
+    vintage: 2022,
+    region: 'Marlborough, New Zealand',
+    alcoholContent: 13.0,
+    volume: '750ml',
+    inStock: true
+  },
+  {
+    id: '11',
+    name: 'Whispering Angel Rosé',
+    category: 'wine',
+    subcategory: 'rose',
+    price: 24.99,
+    rating: 4.4,
+    reviews: 156,
+    image: 'https://images.pexels.com/photos/5490968/pexels-photo-5490968.jpeg?auto=compress&cs=tinysrgb&w=500',
+    description: 'Provence rosé with delicate flavors of strawberry and peach. Perfect for summer evenings.',
+    vintage: 2022,
+    region: 'Provence, France',
+    alcoholContent: 13.0,
+    volume: '750ml',
+    inStock: true
+  },
+
+  // Mixers & Soft Drinks
+  {
+    id: '12',
+    name: 'Fever-Tree Premium Tonic Water',
+    category: 'mixers',
+    price: 12.99,
+    rating: 4.5,
+    reviews: 167,
+    image: 'https://images.pexels.com/photos/6478797/pexels-photo-6478797.jpeg?auto=compress&cs=tinysrgb&w=500',
+    description: 'Premium tonic water made with natural quinine. Perfect mixer for gin and other spirits.',
+    region: 'United Kingdom',
+    alcoholContent: 0.0,
+    volume: '500ml x 4',
+    inStock: true
+  },
+  {
+    id: '13',
+    name: 'Schweppes Ginger Ale',
+    category: 'mixers',
+    price: 8.99,
+    rating: 4.2,
+    reviews: 134,
+    image: 'https://images.pexels.com/photos/5531259/pexels-photo-5531259.jpeg?auto=compress&cs=tinysrgb&w=500',
+    description: 'Classic ginger ale with a crisp, refreshing taste. Ideal for cocktails and enjoying on its own.',
+    region: 'International',
+    alcoholContent: 0.0,
+    volume: '330ml x 6',
+    inStock: true
+  },
+  {
+    id: '14',
+    name: 'San Pellegrino Sparkling Water',
+    category: 'mixers',
+    price: 15.99,
+    rating: 4.6,
+    reviews: 298,
+    image: 'https://images.pexels.com/photos/4553618/pexels-photo-4553618.jpeg?auto=compress&cs=tinysrgb&w=500',
+    description: 'Premium Italian sparkling water with fine bubbles and a clean, refreshing taste.',
+    region: 'Italy',
+    alcoholContent: 0.0,
+    volume: '750ml x 6',
+    inStock: true
+  }
+];
