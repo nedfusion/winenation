@@ -40,6 +40,7 @@ function Shop() {
         // Use fallback data from wines.ts when Supabase is not available
         const { wines } = await import('./data/wines');
         setProducts(wines);
+        setLoading(false);
         return;
       }
 
