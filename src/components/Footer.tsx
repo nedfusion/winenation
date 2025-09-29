@@ -8,9 +8,12 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="col-span-1 lg:col-span-2">
-            <div className="flex items-center space-x-2 mb-4">
-              <Wine className="h-8 w-8 text-red-400" />
-              <h3 className="text-2xl font-bold">WineNation</h3>
+            <div className="flex items-center mb-4">
+              <img 
+                src="/WINENATION Logo.jpg" 
+                alt="WineNation Logo" 
+                className="h-10 w-auto"
+              />
             </div>
             <p className="text-gray-400 mb-6 max-w-md">
               Your premier destination for exceptional beverages from around the world. 

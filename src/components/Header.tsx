@@ -21,9 +21,12 @@ export default function Header({ cartCount, onCartToggle, onSearch }: HeaderProp
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div className="flex items-center space-x-2">
-            <Wine className="h-8 w-8 text-red-700" />
-            <h1 className="text-2xl font-bold text-red-700">WineNation</h1>
+          <div className="flex items-center">
+            <img 
+              src="/WINENATION Logo.jpg" 
+              alt="WineNation Logo" 
+              className="h-12 w-auto"
+            />
           </div>
 
           {/* Desktop Navigation */}
