@@ -74,7 +74,7 @@ function Shop() {
       
       setProducts(transformedProducts);
     } catch (error) {
-      console.error('Error fetching products:', error);
+      console.warn('Error fetching products from Supabase, using fallback data:', error);
       // Fallback to local data if fetch fails
       try {
         const { wines } = await import('./data/wines');
