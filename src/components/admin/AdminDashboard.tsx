@@ -1,14 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Users, 
-  Package, 
-  ShoppingBag, 
-  TrendingUp, 
-  Plus,
-  Edit,
-  Trash2,
-  Eye
-} from 'lucide-react';
+import { Users, Package, ShoppingBag, TrendingUp, Plus, CreditCard as Edit, Trash2, Eye } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import ProductManager from './ProductManager';
 import UserManager from './UserManager';
