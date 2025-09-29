@@ -1,19 +1,32 @@
 import React, { useState } from 'react';
 import { Search, ShoppingCart, User, Menu, Wine } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 
 interface HeaderProps {
   cartCount: number;
   onCartToggle: () => void;
   onSearch: (query: string) => void;
+  onAuthClick: (mode: 'signin' | 'signup') => void;
 }
 
-export default function Header({ cartCount, onCartToggle, onSearch }: HeaderProps) {
+export default function Header({ cartCount, onCartToggle, onSearch, onAuthClick }: HeaderProps) {
+  const { user, profile, signOut } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     onSearch(searchQuery);
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      setShowUserMenu(false);
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
   };
 
   return (
@@ -55,9 +68,62 @@ export default function Header({ cartCount, onCartToggle, onSearch }: HeaderProp
 
           {/* Actions */}
           <div className="flex items-center space-x-4">
-            <button className="text-gray-600 hover:text-red-700 transition-colors">
-              <User className="h-6 w-6" />
-            </button>
+            {user ? (
+              <div className="relative">
+                <button 
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  className="flex items-center space-x-2 text-gray-600 hover:text-red-700 transition-colors"
+                >
+                  <User className="h-6 w-6" />
+                  <span className="hidden sm:block text-sm">
+                    {profile?.full_name || 'Account'}
+                  </span>
+                </button>
+                
+                {showUserMenu && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border z-50">
+                    <div className="py-2">
+                      <div className="px-4 py-2 border-b">
+                        <p className="text-sm font-medium text-gray-900">
+                          {profile?.full_name || 'User'}
+                        </p>
+                        <p className="text-xs text-gray-500">{user.email}</p>
+                      </div>
+                      {profile?.is_admin && (
+                        <a
+                          href="/admin"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        >
+                          Admin Dashboard
+                        </a>
+                      )}
+                      <button
+                        onClick={handleSignOut}
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >
+                        Sign Out
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="flex items-center space-x-2">
+                <button 
+                  onClick={() => onAuthClick('signin')}
+                  className="text-gray-600 hover:text-red-700 transition-colors text-sm"
+                >
+                  Sign In
+                </button>
+                <span className="text-gray-400">|</span>
+                <button 
+                  onClick={() => onAuthClick('signup')}
+                  className="text-gray-600 hover:text-red-700 transition-colors text-sm"
+                >
+                  Sign Up
+                </button>
+              </div>
+            )}
             <button 
               onClick={onCartToggle}
               className="relative text-gray-600 hover:text-red-700 transition-colors"

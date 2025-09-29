@@ -27,3 +27,24 @@ export interface User {
   email: string;
   avatar?: string;
 }
+
+export interface DatabaseProduct {
+  id: string;
+  name: string;
+  category: string;
+  subcategory?: string;
+  price: string;
+  original_price?: string;
+  description: string;
+  image_url: string;
+  vintage?: number;
+  region: string;
+  alcohol_content: string;
+  volume: string;
+  rating: string;
+  reviews_count: number;
+  in_stock: boolean;
+  featured: boolean;
+  created_at: string;
+  updated_at: string;
+}
