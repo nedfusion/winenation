@@ -35,6 +35,12 @@ function Shop() {
 
   const fetchProducts = async () => {
     try {
+      if (!supabase) {
+        console.warn('Supabase client not initialized. Using fallback data.');
+        setProducts([]);
+        return;
+      }
+
       const { data, error } = await supabase
         .from('products')
         .select('*')
