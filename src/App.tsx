@@ -37,7 +37,9 @@ function Shop() {
     try {
       if (!supabase) {
         console.warn('Supabase client not initialized. Using fallback data.');
-        setProducts([]);
+        // Use fallback data from wines.ts when Supabase is not available
+        const { wines } = await import('./data/wines');
+        setProducts(wines);
         return;
       }
 
@@ -72,6 +74,14 @@ function Shop() {
       setProducts(transformedProducts);
     } catch (error) {
       console.error('Error fetching products:', error);
+      // Fallback to local data if fetch fails
+      try {
+        const { wines } = await import('./data/wines');
+        setProducts(wines);
+      } catch (fallbackError) {
+        console.error('Error loading fallback data:', fallbackError);
+        setProducts([]);
+      }
     } finally {
       setLoading(false);
     }
