@@ -166,7 +166,7 @@ function Shop() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header 
+      <Header
         cartCount={cartCount}
         onCartToggle={() => setIsCartOpen(true)}
         onSearch={setSearchQuery}
@@ -174,6 +174,7 @@ function Shop() {
           setAuthModalMode(mode);
           setIsAuthModalOpen(true);
         }}
+        onCategorySelect={setSelectedCategory}
       />
       
       <Hero />

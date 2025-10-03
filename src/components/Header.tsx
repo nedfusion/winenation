@@ -7,9 +7,10 @@ interface HeaderProps {
   onCartToggle: () => void;
   onSearch: (query: string) => void;
   onAuthClick: (mode: 'signin' | 'signup') => void;
+  onCategorySelect: (category: string) => void;
 }
 
-export default function Header({ cartCount, onCartToggle, onSearch, onAuthClick }: HeaderProps) {
+export default function Header({ cartCount, onCartToggle, onSearch, onAuthClick, onCategorySelect }: HeaderProps) {
   const { user, profile, signOut } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -44,12 +45,12 @@ export default function Header({ cartCount, onCartToggle, onSearch, onAuthClick 
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <a href="#" className="text-gray-600 hover:text-red-700 transition-colors">Home</a>
-            <a href="#" className="text-gray-600 hover:text-red-700 transition-colors">Wine</a>
-            <a href="#" className="text-gray-600 hover:text-red-700 transition-colors">Champagne</a>
-            <a href="#" className="text-gray-600 hover:text-red-700 transition-colors">Whisky</a>
-            <a href="#" className="text-gray-600 hover:text-red-700 transition-colors">Spirits</a>
-            <a href="#" className="text-gray-600 hover:text-red-700 transition-colors">Cognac</a>
+            <button onClick={() => onCategorySelect('all')} className="text-gray-600 hover:text-red-700 transition-colors">Home</button>
+            <button onClick={() => onCategorySelect('wine')} className="text-gray-600 hover:text-red-700 transition-colors">Wine</button>
+            <button onClick={() => onCategorySelect('champagne')} className="text-gray-600 hover:text-red-700 transition-colors">Champagne</button>
+            <button onClick={() => onCategorySelect('whisky')} className="text-gray-600 hover:text-red-700 transition-colors">Whisky</button>
+            <button onClick={() => onCategorySelect('spirits')} className="text-gray-600 hover:text-red-700 transition-colors">Spirits</button>
+            <button onClick={() => onCategorySelect('cognac')} className="text-gray-600 hover:text-red-700 transition-colors">Cognac</button>
           </nav>
 
           {/* Search Bar */}
@@ -148,12 +149,12 @@ export default function Header({ cartCount, onCartToggle, onSearch, onAuthClick 
         {isMenuOpen && (
           <div className="md:hidden bg-white border-t">
             <div className="px-2 pt-2 pb-3 space-y-1">
-              <a href="#" className="block px-3 py-2 text-gray-600 hover:text-red-700">Home</a>
-              <a href="#" className="block px-3 py-2 text-gray-600 hover:text-red-700">Wine</a>
-              <a href="#" className="block px-3 py-2 text-gray-600 hover:text-red-700">Champagne</a>
-              <a href="#" className="block px-3 py-2 text-gray-600 hover:text-red-700">Whisky</a>
-              <a href="#" className="block px-3 py-2 text-gray-600 hover:text-red-700">Spirits</a>
-              <a href="#" className="block px-3 py-2 text-gray-600 hover:text-red-700">Cognac</a>
+              <button onClick={() => { onCategorySelect('all'); setIsMenuOpen(false); }} className="block w-full text-left px-3 py-2 text-gray-600 hover:text-red-700">Home</button>
+              <button onClick={() => { onCategorySelect('wine'); setIsMenuOpen(false); }} className="block w-full text-left px-3 py-2 text-gray-600 hover:text-red-700">Wine</button>
+              <button onClick={() => { onCategorySelect('champagne'); setIsMenuOpen(false); }} className="block w-full text-left px-3 py-2 text-gray-600 hover:text-red-700">Champagne</button>
+              <button onClick={() => { onCategorySelect('whisky'); setIsMenuOpen(false); }} className="block w-full text-left px-3 py-2 text-gray-600 hover:text-red-700">Whisky</button>
+              <button onClick={() => { onCategorySelect('spirits'); setIsMenuOpen(false); }} className="block w-full text-left px-3 py-2 text-gray-600 hover:text-red-700">Spirits</button>
+              <button onClick={() => { onCategorySelect('cognac'); setIsMenuOpen(false); }} className="block w-full text-left px-3 py-2 text-gray-600 hover:text-red-700">Cognac</button>
             </div>
             <div className="px-4 py-3 border-t">
               <form onSubmit={handleSearch} className="flex">
