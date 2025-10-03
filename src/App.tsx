@@ -23,7 +23,7 @@ function Shop() {
   const [authModalMode, setAuthModalMode] = useState<'signin' | 'signup'>('signin');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000000]);
   const [products, setProducts] = useState<Wine[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -221,7 +221,7 @@ function Shop() {
                   onClick={() => {
                     setSearchQuery('');
                     setSelectedCategory('all');
-                    setPriceRange([0, 1000]);
+                    setPriceRange([0, 1000000]);
                   }}
                   className="mt-4 text-red-600 hover:text-red-700 font-medium"
                 >
