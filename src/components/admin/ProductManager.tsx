@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, CreditCard as Edit, Trash2, Search } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import ProductFormModal from './ProductFormModal';
 
 interface Product {
   id: string;
@@ -86,7 +87,10 @@ export default function ProductManager() {
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-gray-900">Product Management</h2>
         <button
-          onClick={() => setShowAddModal(true)}
+          onClick={() => {
+            setEditingProduct(null);
+            setShowAddModal(true);
+          }}
           className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors flex items-center space-x-2"
         >
           <Plus className="h-4 w-4" />
@@ -181,7 +185,10 @@ export default function ProductManager() {
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex space-x-2">
                       <button
-                        onClick={() => setEditingProduct(product)}
+                        onClick={() => {
+                          setEditingProduct(product);
+                          setShowAddModal(true);
+                        }}
                         className="text-indigo-600 hover:text-indigo-900"
                       >
                         <Edit className="h-4 w-4" />
@@ -206,6 +213,16 @@ export default function ProductManager() {
           <p className="text-gray-500">No products found.</p>
         </div>
       )}
+
+      <ProductFormModal
+        isOpen={showAddModal}
+        onClose={() => {
+          setShowAddModal(false);
+          setEditingProduct(null);
+        }}
+        product={editingProduct}
+        onSuccess={fetchProducts}
+      />
     </div>
   );
 }
