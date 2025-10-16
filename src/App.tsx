@@ -10,6 +10,7 @@ import AuthModal from './components/auth/AuthModal';
 import CheckoutModal from './components/checkout/CheckoutModal';
 import AdminDashboard from './components/admin/AdminDashboard';
 import AdminLogin from './components/admin/AdminLogin';
+import SuperAdminSetup from './components/admin/SuperAdminSetup';
 import Footer from './components/Footer';
 import { supabase } from './lib/supabase';
 import { Wine, CartItem } from './types';
@@ -311,6 +312,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Shop />} />
+          <Route path="/admin/setup" element={<SuperAdminSetup />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={<AdminRoute />} />
         </Routes>
