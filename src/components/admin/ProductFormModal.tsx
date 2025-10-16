@@ -2,6 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import ImageUpload from './ImageUpload';
+import MultipleImageUpload from './MultipleImageUpload';
+
+interface ImageData {
+  id?: string;
+  url: string;
+  is_primary: boolean;
+  display_order: number;
+}
 
 interface Product {
   id: string;
@@ -20,6 +28,8 @@ interface Product {
   reviews_count: number;
   in_stock: boolean;
   featured: boolean;
+  stock_quantity?: number;
+  low_stock_threshold?: number;
 }
 
 interface ProductFormModalProps {
@@ -31,6 +41,7 @@ interface ProductFormModalProps {
 
 export default function ProductFormModal({ isOpen, onClose, product, onSuccess }: ProductFormModalProps) {
   const [loading, setLoading] = useState(false);
+  const [productImages, setProductImages] = useState<ImageData[]>([]);
   const [formData, setFormData] = useState({
     name: '',
     category: 'wine',
@@ -46,7 +57,9 @@ export default function ProductFormModal({ isOpen, onClose, product, onSuccess }
     rating: '4.5',
     reviews_count: '0',
     in_stock: true,
-    featured: false
+    featured: false,
+    stock_quantity: '0',
+    low_stock_threshold: '10'
   });
 
   useEffect(() => {
@@ -66,16 +79,45 @@ export default function ProductFormModal({ isOpen, onClose, product, onSuccess }
         rating: product.rating.toString(),
         reviews_count: product.reviews_count.toString(),
         in_stock: product.in_stock,
-        featured: product.featured
+        featured: product.featured,
+        stock_quantity: product.stock_quantity?.toString() || '0',
+        low_stock_threshold: product.low_stock_threshold?.toString() || '10'
       });
+      fetchProductImages(product.id);
     }
   }, [product]);
+
+  const fetchProductImages = async (productId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('product_images')
+        .select('*')
+        .eq('product_id', productId)
+        .order('display_order');
+
+      if (error) throw error;
+
+      if (data && data.length > 0) {
+        setProductImages(data.map(img => ({
+          id: img.id,
+          url: img.image_url,
+          is_primary: img.is_primary,
+          display_order: img.display_order
+        })));
+      }
+    } catch (error) {
+      console.error('Error fetching product images:', error);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
+      const primaryImage = productImages.find(img => img.is_primary);
+      const stockQty = parseInt(formData.stock_quantity);
+
       const productData = {
         name: formData.name,
         category: formData.category.toLowerCase(),
@@ -83,16 +125,20 @@ export default function ProductFormModal({ isOpen, onClose, product, onSuccess }
         price: parseFloat(formData.price),
         original_price: formData.original_price ? parseFloat(formData.original_price) : null,
         description: formData.description,
-        image_url: formData.image_url,
+        image_url: primaryImage?.url || formData.image_url || '',
         vintage: formData.vintage ? parseInt(formData.vintage) : null,
         region: formData.region,
         alcohol_content: parseFloat(formData.alcohol_content),
         volume: formData.volume,
         rating: parseFloat(formData.rating),
         reviews_count: parseInt(formData.reviews_count),
-        in_stock: formData.in_stock,
-        featured: formData.featured
+        in_stock: stockQty > 0,
+        featured: formData.featured,
+        stock_quantity: stockQty,
+        low_stock_threshold: parseInt(formData.low_stock_threshold)
       };
+
+      let productId = product?.id;
 
       if (product) {
         const { error } = await supabase
@@ -101,12 +147,35 @@ export default function ProductFormModal({ isOpen, onClose, product, onSuccess }
           .eq('id', product.id);
 
         if (error) throw error;
+
+        await supabase
+          .from('product_images')
+          .delete()
+          .eq('product_id', product.id);
       } else {
-        const { error } = await supabase
+        const { data: newProduct, error } = await supabase
           .from('products')
-          .insert([productData]);
+          .insert([productData])
+          .select()
+          .single();
 
         if (error) throw error;
+        productId = newProduct.id;
+      }
+
+      if (productImages.length > 0 && productId) {
+        const imageRecords = productImages.map(img => ({
+          product_id: productId,
+          image_url: img.url,
+          is_primary: img.is_primary,
+          display_order: img.display_order
+        }));
+
+        const { error: imagesError } = await supabase
+          .from('product_images')
+          .insert(imageRecords);
+
+        if (imagesError) throw imagesError;
       }
 
       onSuccess();
@@ -135,8 +204,11 @@ export default function ProductFormModal({ isOpen, onClose, product, onSuccess }
       rating: '4.5',
       reviews_count: '0',
       in_stock: true,
-      featured: false
+      featured: false,
+      stock_quantity: '0',
+      low_stock_threshold: '10'
     });
+    setProductImages([]);
     onClose();
   };
 
@@ -160,9 +232,10 @@ export default function ProductFormModal({ isOpen, onClose, product, onSuccess }
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="md:col-span-2">
-              <ImageUpload
-                currentImageUrl={formData.image_url}
-                onImageUrlChange={(url) => setFormData({ ...formData, image_url: url })}
+              <MultipleImageUpload
+                productId={product?.id}
+                images={productImages}
+                onImagesChange={setProductImages}
                 disabled={loading}
               />
             </div>
@@ -327,6 +400,34 @@ export default function ProductFormModal({ isOpen, onClose, product, onSuccess }
               />
             </div>
 
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Stock Quantity *
+              </label>
+              <input
+                type="number"
+                required
+                min="0"
+                value={formData.stock_quantity}
+                onChange={(e) => setFormData({ ...formData, stock_quantity: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Low Stock Alert Threshold *
+              </label>
+              <input
+                type="number"
+                required
+                min="0"
+                value={formData.low_stock_threshold}
+                onChange={(e) => setFormData({ ...formData, low_stock_threshold: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+              />
+            </div>
+
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Description *
@@ -338,18 +439,6 @@ export default function ProductFormModal({ isOpen, onClose, product, onSuccess }
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
               />
-            </div>
-
-            <div>
-              <label className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  checked={formData.in_stock}
-                  onChange={(e) => setFormData({ ...formData, in_stock: e.target.checked })}
-                  className="rounded text-red-600 focus:ring-red-500"
-                />
-                <span className="text-sm font-medium text-gray-700">In Stock</span>
-              </label>
             </div>
 
             <div>

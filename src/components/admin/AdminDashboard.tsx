@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Package, ShoppingBag, TrendingUp, Plus, CreditCard as Edit, Trash2, Eye } from 'lucide-react';
+import { Users, Package, ShoppingBag, TrendingUp, Plus, CreditCard as Edit, Trash2, Eye, PackageCheck } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import ProductManager from './ProductManager';
 import UserManager from './UserManager';
 import OrderManager from './OrderManager';
+import StockManager from './StockManager';
 
 interface DashboardStats {
   totalUsers: number;
@@ -61,6 +62,7 @@ export default function AdminDashboard() {
   const tabs = [
     { id: 'overview', label: 'Overview', icon: TrendingUp },
     { id: 'products', label: 'Products', icon: Package },
+    { id: 'stock', label: 'Stock Management', icon: PackageCheck },
     { id: 'users', label: 'Users', icon: Users },
     { id: 'orders', label: 'Orders', icon: ShoppingBag }
   ];
@@ -177,6 +179,7 @@ export default function AdminDashboard() {
         )}
 
         {activeTab === 'products' && <ProductManager />}
+        {activeTab === 'stock' && <StockManager />}
         {activeTab === 'users' && <UserManager />}
         {activeTab === 'orders' && <OrderManager />}
       </div>
