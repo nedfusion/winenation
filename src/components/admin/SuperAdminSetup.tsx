@@ -11,21 +11,35 @@ export default function SuperAdminSetup() {
   const [checking, setChecking] = useState(true);
   const [error, setError] = useState('');
   const [hasAdmins, setHasAdmins] = useState(false);
+  const [supabaseError, setSupabaseError] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (!supabase) {
+      setSupabaseError(true);
+      setChecking(false);
+      return;
+    }
     checkForAdmins();
   }, []);
 
   const checkForAdmins = async () => {
     try {
+      if (!supabase) {
+        console.error('Supabase client not initialized');
+        setChecking(false);
+        return;
+      }
+
       const { data, error } = await supabase
         .from('profiles')
         .select('id')
         .eq('is_admin', true)
         .limit(1);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error from Supabase:', error);
+      }
 
       if (data && data.length > 0) {
         setHasAdmins(true);
@@ -43,6 +57,10 @@ export default function SuperAdminSetup() {
     setError('');
 
     try {
+      if (!supabase) {
+        throw new Error('Supabase client not initialized');
+      }
+
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
@@ -56,6 +74,8 @@ export default function SuperAdminSetup() {
       if (signUpError) throw signUpError;
 
       if (signUpData.user) {
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
         const { error: updateError } = await supabase
           .from('profiles')
           .update({ is_admin: true })
@@ -72,6 +92,22 @@ export default function SuperAdminSetup() {
       setLoading(false);
     }
   };
+
+  if (supabaseError) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+        <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
+          <div className="bg-red-100 p-3 rounded-full inline-block mb-4">
+            <ShieldCheck className="h-8 w-8 text-red-600" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Database Not Configured</h2>
+          <p className="text-gray-600 mb-6">
+            Supabase environment variables are not configured. Please check your .env file.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   if (checking) {
     return (
