@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { ShieldCheck, Loader2 } from 'lucide-react';
@@ -14,20 +14,12 @@ export default function SuperAdminSetup() {
   const [supabaseError, setSupabaseError] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!supabase) {
-      setSupabaseError(true);
-      setChecking(false);
-      return;
-    }
-    checkForAdmins();
-  }, []);
-
-  const checkForAdmins = async () => {
+  const checkForAdmins = useCallback(async () => {
     try {
       if (!supabase) {
         console.error('Supabase client not initialized');
         setChecking(false);
+        setSupabaseError(true);
         return;
       }
 
@@ -49,7 +41,11 @@ export default function SuperAdminSetup() {
     } finally {
       setChecking(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    checkForAdmins();
+  }, [checkForAdmins]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
