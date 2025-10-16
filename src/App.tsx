@@ -9,9 +9,11 @@ import Cart from './components/Cart';
 import AuthModal from './components/auth/AuthModal';
 import CheckoutModal from './components/checkout/CheckoutModal';
 import AdminDashboard from './components/admin/AdminDashboard';
+import AdminLogin from './components/admin/AdminLogin';
 import Footer from './components/Footer';
 import { supabase } from './lib/supabase';
 import { Wine, CartItem } from './types';
+import { Lock } from 'lucide-react';
 
 // Main Shop Component
 function Shop() {
@@ -273,8 +275,30 @@ function AdminRoute() {
     );
   }
 
-  if (!user || !profile?.is_admin) {
-    return <Navigate to="/" replace />;
+  if (!user) {
+    return <Navigate to="/admin/login" replace />;
+  }
+
+  if (!profile?.is_admin) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+        <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
+          <div className="bg-red-100 p-3 rounded-full inline-block mb-4">
+            <Lock className="h-8 w-8 text-red-600" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h2>
+          <p className="text-gray-600 mb-6">
+            You do not have administrator privileges to access this page.
+          </p>
+          <button
+            onClick={() => window.location.href = '/'}
+            className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition-colors"
+          >
+            Go to Homepage
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return <AdminDashboard />;
@@ -287,6 +311,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Shop />} />
+          <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={<AdminRoute />} />
         </Routes>
       </Router>
