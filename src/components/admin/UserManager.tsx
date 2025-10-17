@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Shield, User, ChevronDown } from 'lucide-react';
+import { Search, Shield, User, ChevronDown, Plus, X } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
 interface Profile {
@@ -19,6 +19,15 @@ export default function UserManager() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [editingRole, setEditingRole] = useState<string | null>(null);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newUserData, setNewUserData] = useState({
+    email: '',
+    password: '',
+    fullName: '',
+    adminRole: 'viewer' as 'super_admin' | 'product_manager' | 'order_manager' | 'viewer'
+  });
+  const [addingUser, setAddingUser] = useState(false);
+  const [addError, setAddError] = useState('');
 
   useEffect(() => {
     fetchUsers();
@@ -88,6 +97,54 @@ export default function UserManager() {
     }
   };
 
+  const handleAddUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAddingUser(true);
+    setAddError('');
+
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email: newUserData.email,
+        password: newUserData.password,
+        options: {
+          data: {
+            full_name: newUserData.fullName
+          }
+        }
+      });
+
+      if (error) throw error;
+
+      if (data.user) {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .update({
+            is_admin: true,
+            admin_role: newUserData.adminRole,
+            full_name: newUserData.fullName,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', data.user.id);
+
+        if (profileError) throw profileError;
+
+        await fetchUsers();
+        setShowAddModal(false);
+        setNewUserData({
+          email: '',
+          password: '',
+          fullName: '',
+          adminRole: 'viewer'
+        });
+      }
+    } catch (error: any) {
+      console.error('Error adding user:', error);
+      setAddError(error.message || 'Failed to add user');
+    } finally {
+      setAddingUser(false);
+    }
+  };
+
   const filteredUsers = users.filter(user =>
     user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
     (user.full_name && user.full_name.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -106,8 +163,17 @@ export default function UserManager() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-gray-900">User Management</h2>
-        <div className="text-sm text-gray-600">
-          Total Users: {users.length}
+        <div className="flex items-center space-x-4">
+          <div className="text-sm text-gray-600">
+            Total Users: {users.length}
+          </div>
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="flex items-center space-x-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
+          >
+            <Plus className="h-5 w-5" />
+            <span>Add Admin User</span>
+          </button>
         </div>
       </div>
 
@@ -235,6 +301,113 @@ export default function UserManager() {
       {filteredUsers.length === 0 && (
         <div className="text-center py-12">
           <p className="text-gray-500">No users found.</p>
+        </div>
+      )}
+
+      {/* Add User Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold text-gray-900">Add Admin User</h3>
+              <button
+                onClick={() => {
+                  setShowAddModal(false);
+                  setAddError('');
+                }}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+
+            <form onSubmit={handleAddUser} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={newUserData.fullName}
+                  onChange={(e) => setNewUserData({ ...newUserData, fullName: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                  placeholder="John Doe"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  required
+                  value={newUserData.email}
+                  onChange={(e) => setNewUserData({ ...newUserData, email: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                  placeholder="admin@winenation.ng"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Password
+                </label>
+                <input
+                  type="password"
+                  required
+                  value={newUserData.password}
+                  onChange={(e) => setNewUserData({ ...newUserData, password: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                  placeholder="Minimum 6 characters"
+                  minLength={6}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Admin Role
+                </label>
+                <select
+                  value={newUserData.adminRole}
+                  onChange={(e) => setNewUserData({ ...newUserData, adminRole: e.target.value as any })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                >
+                  <option value="viewer">Viewer - View only access</option>
+                  <option value="product_manager">Product Manager - Manage products</option>
+                  <option value="order_manager">Order Manager - Manage orders</option>
+                  <option value="super_admin">Super Admin - Full access</option>
+                </select>
+              </div>
+
+              {addError && (
+                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                  {addError}
+                </div>
+              )}
+
+              <div className="flex space-x-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowAddModal(false);
+                    setAddError('');
+                  }}
+                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={addingUser}
+                  className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {addingUser ? 'Adding...' : 'Add User'}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>
