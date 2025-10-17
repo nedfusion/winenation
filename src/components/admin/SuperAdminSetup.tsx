@@ -70,14 +70,45 @@ export default function SuperAdminSetup() {
       if (signUpError) throw signUpError;
 
       if (signUpData.user) {
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        await new Promise(resolve => setTimeout(resolve, 3000));
 
-        const { error: updateError } = await supabase
+        const { data: profile, error: selectError } = await supabase
           .from('profiles')
-          .update({ is_admin: true })
-          .eq('id', signUpData.user.id);
+          .select('id')
+          .eq('id', signUpData.user.id)
+          .maybeSingle();
 
-        if (updateError) throw updateError;
+        if (selectError) {
+          throw new Error('Error checking profile: ' + selectError.message);
+        }
+
+        if (!profile) {
+          const { error: insertError } = await supabase
+            .from('profiles')
+            .insert({
+              id: signUpData.user.id,
+              email: email,
+              full_name: fullName,
+              is_admin: true,
+              admin_role: 'super_admin'
+            });
+
+          if (insertError) {
+            throw new Error('Database error saving new user: ' + insertError.message);
+          }
+        } else {
+          const { error: updateError } = await supabase
+            .from('profiles')
+            .update({
+              is_admin: true,
+              admin_role: 'super_admin'
+            })
+            .eq('id', signUpData.user.id);
+
+          if (updateError) {
+            throw new Error('Error updating profile: ' + updateError.message);
+          }
+        }
 
         alert('Super admin account created successfully! You can now sign in.');
         navigate('/admin/login');
