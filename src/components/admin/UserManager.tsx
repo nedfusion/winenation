@@ -103,40 +103,43 @@ export default function UserManager() {
     setAddError('');
 
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email: newUserData.email,
-        password: newUserData.password,
-        options: {
-          data: {
-            full_name: newUserData.fullName
-          }
-        }
-      });
+      const { data: { session } } = await supabase.auth.getSession();
 
-      if (error) throw error;
-
-      if (data.user) {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .update({
-            is_admin: true,
-            admin_role: newUserData.adminRole,
-            full_name: newUserData.fullName,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', data.user.id);
-
-        if (profileError) throw profileError;
-
-        await fetchUsers();
-        setShowAddModal(false);
-        setNewUserData({
-          email: '',
-          password: '',
-          fullName: '',
-          adminRole: 'viewer'
-        });
+      if (!session) {
+        throw new Error('Not authenticated');
       }
+
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-admin-user`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: newUserData.email,
+            password: newUserData.password,
+            fullName: newUserData.fullName,
+            adminRole: newUserData.adminRole
+          })
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || 'Failed to create user');
+      }
+
+      await fetchUsers();
+      setShowAddModal(false);
+      setNewUserData({
+        email: '',
+        password: '',
+        fullName: '',
+        adminRole: 'viewer'
+      });
     } catch (error: any) {
       console.error('Error adding user:', error);
       setAddError(error.message || 'Failed to add user');
