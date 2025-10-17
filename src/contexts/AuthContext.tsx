@@ -58,10 +58,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
+        console.log('Auth state changed:', event, session?.user?.email);
         setUser(session?.user ?? null);
         if (session?.user) {
-          await fetchProfile(session.user.id);
+          (async () => {
+            await fetchProfile(session.user.id);
+          })();
         } else {
           setProfile(null);
           setLoading(false);
@@ -72,7 +75,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => subscription.unsubscribe();
   }, []);
 
-  const fetchProfile = async (userId: string) => {
+  const fetchProfile = async (userId: string, retries = 3) => {
     if (!supabase) {
       console.warn('Supabase client not available');
       setLoading(false);
@@ -80,7 +83,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     try {
-      console.log('Fetching profile for user:', userId);
+      console.log('Fetching profile for user:', userId, 'attempt:', 4 - retries);
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
@@ -89,10 +92,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (error) {
         console.error('Error fetching profile:', error);
+        if (retries > 0) {
+          console.log('Retrying profile fetch in 1 second...');
+          setTimeout(() => fetchProfile(userId, retries - 1), 1000);
+          return;
+        }
         throw error;
       }
 
-      console.log('Profile fetched:', data);
+      if (!data && retries > 0) {
+        console.log('Profile not found, retrying in 1 second...');
+        setTimeout(() => fetchProfile(userId, retries - 1), 1000);
+        return;
+      }
+
+      console.log('Profile fetched successfully:', data);
       setProfile(data);
     } catch (error) {
       console.error('Error in fetchProfile:', error);
