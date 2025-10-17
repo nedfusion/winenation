@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Super Admin</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #991b1b;
+            margin-bottom: 20px;
+        }
+        .result {
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 5px;
+        }
+        .success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        button {
+            background: #dc2626;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #991b1b;
+        }
+        button:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Create Super Admin Account</h1>
+        <p><strong>Name:</strong> Obinna Charles</p>
+        <p><strong>Email:</strong> charles.obinna@winenation.ng</p>
+        <p><strong>Password:</strong> Mypass.1000@@</p>
+
+        <button id="createBtn" onclick="createAdmin()">Create Super Admin Account</button>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://fbsnoieeegpzwmwqpqul.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZic25vaWVlZWdwendtd3FwcXVsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkxMzk3MzYsImV4cCI6MjA3NDcxNTczNn0.DRXzdoY0tw-jsJ2TV_84ybwG8xGe3Fj62l8RPqmLN-M';
+
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        async function createAdmin() {
+            const btn = document.getElementById('createBtn');
+            const resultDiv = document.getElementById('result');
+
+            btn.disabled = true;
+            btn.textContent = 'Creating...';
+            resultDiv.innerHTML = '';
+
+            try {
+                // Call the Edge Function
+                const response = await fetch(`${SUPABASE_URL}/functions/v1/create-super-admin`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                    },
+                    body: JSON.stringify({
+                        email: 'charles.obinna@winenation.ng',
+                        password: 'Mypass.1000@@',
+                        fullName: 'Obinna Charles'
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `
+                        <strong>✓ Success!</strong><br>
+                        Super admin account created successfully!<br>
+                        User ID: ${data.userId}<br><br>
+                        You can now login at <a href="https://winenation.ng/admin/login">winenation.ng/admin/login</a>
+                    `;
+                } else {
+                    throw new Error(data.error || 'Unknown error');
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `<strong>✗ Error:</strong> ${error.message}`;
+                btn.disabled = false;
+                btn.textContent = 'Retry';
+            }
+        }
+    </script>
+</body>
+</html>
