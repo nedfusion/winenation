@@ -1,0 +1,115 @@
+╔══════════════════════════════════════════════════════════════════╗
+║                                                                  ║
+║              👇 THE DIST FOLDER IS RIGHT HERE! 👇               ║
+║                                                                  ║
+║  It's in the SAME folder as this text file you're reading now!  ║
+║                                                                  ║
+╚══════════════════════════════════════════════════════════════════╝
+
+
+📂 YOUR PROJECT ROOT FOLDER CONTAINS:
+═══════════════════════════════════════════════════════════════════
+
+📁 .bolt/
+📁 node_modules/
+📁 public/
+📁 src/
+📁 supabase/
+
+📁 dist/  ← ← ← ← ← THIS IS IT! OPEN THIS FOLDER! ← ← ← ← ←
+
+📄 package.json
+📄 README.md
+📄 vite.config.ts
+📄 WHERE-IS-DIST-FOLDER.md
+📄 winenation-dist.tar.gz
+📄 📁-DIST-FOLDER-IS-HERE.txt  (this file you're reading)
+... and other files
+
+
+═══════════════════════════════════════════════════════════════════
+🎯 WHAT TO DO:
+═══════════════════════════════════════════════════════════════════
+
+OPTION 1: Use the dist Folder Directly
+---------------------------------------
+1. Open the "dist" folder (it's right here!)
+2. Inside you'll find:
+   - index.html
+   - assets/ folder
+   - images and videos
+   - START-HERE.txt (read this for instructions)
+3. Upload ALL these files to your website
+
+OPTION 2: Use the Archive File
+-------------------------------
+1. Find: winenation-dist.tar.gz (same location as this file)
+2. Download it
+3. Extract it
+4. Upload the contents
+
+
+═══════════════════════════════════════════════════════════════════
+🔍 STILL CAN'T SEE IT?
+═══════════════════════════════════════════════════════════════════
+
+Try these:
+
+1. REFRESH your file explorer/browser
+2. Sort files alphabetically - "dist" comes after "DEPLOYMENT"
+3. Look for folders that start with "d" - dist is there!
+4. If on Mac: Press Cmd + Shift + . (to show hidden files)
+5. If on Windows: View → Show → Hidden items
+
+Or just search for: "index-BHCXNNdo.js"
+(This file ONLY exists in the dist folder)
+
+
+═══════════════════════════════════════════════════════════════════
+✅ CONFIRM IT EXISTS:
+═══════════════════════════════════════════════════════════════════
+
+The dist folder contains these files:
+
+✓ index.html (1.5 KB)
+✓ assets/index-BHCXNNdo.js (539 KB)
+✓ assets/index-BC9X9Dao.css (24 KB)
+✓ assets/wines-C1PmgyJs.js (6 KB)
+✓ WINENATION Logo.jpg
+✓ winenation video.mp4
+✓ WhatsApp Video 2025-09-26 at 18.12.49_1fce8a2e.mp4
+✓ START-HERE.txt
+
+Total: 8 files (1 folder + 7 files)
+Size: ~165 KB when compressed
+
+
+═══════════════════════════════════════════════════════════════════
+📍 LOCATION PATH:
+═══════════════════════════════════════════════════════════════════
+
+Full path: /tmp/cc-agent/57334882/project/dist/
+
+Relative to project root: ./dist/
+
+
+═══════════════════════════════════════════════════════════════════
+🚀 UPLOAD INSTRUCTIONS:
+═══════════════════════════════════════════════════════════════════
+
+1. Go into the dist folder
+2. Select ALL files inside it
+3. Upload to your web server's root directory
+4. Clear your browser cache
+5. Hard refresh your website
+6. Done!
+
+
+═══════════════════════════════════════════════════════════════════
+
+If you're reading this file, the dist folder is literally
+RIGHT NEXT TO IT in the same directory!
+
+Just scroll up/down in your file list to find "dist" folder!
+
+═══════════════════════════════════════════════════════════════════
