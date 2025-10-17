@@ -189,15 +189,17 @@ export default function ProductManager() {
                           setEditingProduct(product);
                           setShowAddModal(true);
                         }}
-                        className="text-indigo-600 hover:text-indigo-900"
+                        className="p-2 text-blue-600 hover:text-blue-900 hover:bg-blue-50 rounded-lg transition-colors"
+                        title="Edit Product"
                       >
-                        <Edit className="h-4 w-4" />
+                        <Edit className="h-5 w-5" />
                       </button>
                       <button
                         onClick={() => deleteProduct(product.id)}
-                        className="text-red-600 hover:text-red-900"
+                        className="p-2 text-red-600 hover:text-red-900 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Delete Product"
                       >
-                        <Trash2 className="h-4 w-4" />
+                        <Trash2 className="h-5 w-5" />
                       </button>
                     </div>
                   </td>
