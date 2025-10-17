@@ -65,23 +65,23 @@ export default function ProductFormModal({ isOpen, onClose, product, onSuccess }
   useEffect(() => {
     if (product) {
       setFormData({
-        name: product.name,
-        category: product.category,
+        name: product.name || '',
+        category: product.category || 'wine',
         subcategory: product.subcategory || '',
-        price: product.price.toString(),
-        original_price: product.original_price?.toString() || '',
-        description: product.description,
-        image_url: product.image_url,
-        vintage: product.vintage?.toString() || '',
-        region: product.region,
-        alcohol_content: product.alcohol_content.toString(),
-        volume: product.volume,
-        rating: product.rating.toString(),
-        reviews_count: product.reviews_count.toString(),
-        in_stock: product.in_stock,
-        featured: product.featured,
-        stock_quantity: product.stock_quantity?.toString() || '0',
-        low_stock_threshold: product.low_stock_threshold?.toString() || '10'
+        price: product.price != null ? product.price.toString() : '',
+        original_price: product.original_price != null ? product.original_price.toString() : '',
+        description: product.description || '',
+        image_url: product.image_url || '',
+        vintage: product.vintage != null ? product.vintage.toString() : '',
+        region: product.region || '',
+        alcohol_content: product.alcohol_content != null ? product.alcohol_content.toString() : '',
+        volume: product.volume || '750ml',
+        rating: product.rating != null ? product.rating.toString() : '4.5',
+        reviews_count: product.reviews_count != null ? product.reviews_count.toString() : '0',
+        in_stock: product.in_stock ?? true,
+        featured: product.featured ?? false,
+        stock_quantity: product.stock_quantity != null ? product.stock_quantity.toString() : '0',
+        low_stock_threshold: product.low_stock_threshold != null ? product.low_stock_threshold.toString() : '10'
       });
       fetchProductImages(product.id);
     }
