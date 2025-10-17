@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Package, ShoppingBag, TrendingUp, Plus, CreditCard as Edit, Trash2, Eye, PackageCheck, Shield } from 'lucide-react';
+import { Users, Package, ShoppingBag, TrendingUp, Plus, CreditCard as Edit, Trash2, Eye, PackageCheck, Shield, LogOut, Home } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAdminRole } from '../../hooks/useAdminRole';
+import { useAuth } from '../../contexts/AuthContext';
 import ProductManager from './ProductManager';
 import UserManager from './UserManager';
 import OrderManager from './OrderManager';
@@ -24,6 +25,16 @@ export default function AdminDashboard() {
   });
   const [loading, setLoading] = useState(true);
   const { role, canManageProducts, canManageOrders, canManageUsers, loading: roleLoading } = useAdminRole();
+  const { signOut, user } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      window.location.href = '/';
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
 
   useEffect(() => {
     fetchDashboardStats();
@@ -103,18 +114,37 @@ export default function AdminDashboard() {
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
             <p className="text-gray-600">Manage your WineNation store</p>
+            {user && (
+              <p className="text-sm text-gray-500 mt-1">Logged in as: {user.email}</p>
+            )}
           </div>
-          {role && (
-            <div className="flex items-center space-x-2 bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-200">
-              <Shield className="h-5 w-5 text-red-600" />
-              <div>
-                <p className="text-xs text-gray-500">Role</p>
-                <p className="text-sm font-semibold text-gray-900 capitalize">
-                  {role.replace('_', ' ')}
-                </p>
+          <div className="flex items-center space-x-3">
+            {role && (
+              <div className="flex items-center space-x-2 bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-200">
+                <Shield className="h-5 w-5 text-red-600" />
+                <div>
+                  <p className="text-xs text-gray-500">Role</p>
+                  <p className="text-sm font-semibold text-gray-900 capitalize">
+                    {role.replace('_', ' ')}
+                  </p>
+                </div>
               </div>
-            </div>
-          )}
+            )}
+            <a
+              href="/"
+              className="flex items-center space-x-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+            >
+              <Home className="h-5 w-5" />
+              <span>Back to Store</span>
+            </a>
+            <button
+              onClick={handleLogout}
+              className="flex items-center space-x-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            >
+              <LogOut className="h-5 w-5" />
+              <span>Logout</span>
+            </button>
+          </div>
         </div>
 
         {/* Navigation Tabs */}
