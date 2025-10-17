@@ -96,7 +96,7 @@ export default function AdminDashboard() {
     </div>
   );
 
-  if (loading) {
+  if (loading || roleLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -110,7 +110,7 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8 flex items-center justify-between">
+        <div className="mb-8 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
             <p className="text-gray-600">Manage your WineNation store</p>
@@ -118,7 +118,7 @@ export default function AdminDashboard() {
               <p className="text-sm text-gray-500 mt-1">Logged in as: {user.email}</p>
             )}
           </div>
-          <div className="flex items-center space-x-3">
+          <div className="flex flex-wrap items-center gap-3">
             {role && (
               <div className="flex items-center space-x-2 bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-200">
                 <Shield className="h-5 w-5 text-red-600" />
@@ -135,11 +135,12 @@ export default function AdminDashboard() {
               className="flex items-center space-x-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
             >
               <Home className="h-5 w-5" />
-              <span>Back to Store</span>
+              <span className="hidden sm:inline">Back to Store</span>
+              <span className="sm:hidden">Store</span>
             </a>
             <button
               onClick={handleLogout}
-              className="flex items-center space-x-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              className="flex items-center space-x-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors shadow-md"
             >
               <LogOut className="h-5 w-5" />
               <span>Logout</span>

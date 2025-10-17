@@ -23,9 +23,13 @@ export function useAdminRole(): AdminRoleData {
   });
 
   useEffect(() => {
+    let mounted = true;
+
     const fetchAdminRole = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
+
+        if (!mounted) return;
 
         if (!user) {
           setRoleData({
@@ -45,10 +49,14 @@ export function useAdminRole(): AdminRoleData {
           .eq('id', user.id)
           .maybeSingle();
 
+        if (!mounted) return;
+
         if (error) throw error;
 
         const isAdmin = profile?.is_admin || false;
         const role = (profile?.admin_role as AdminRole) || null;
+
+        console.log('Admin role fetched:', { isAdmin, role, profile });
 
         setRoleData({
           role,
@@ -60,6 +68,8 @@ export function useAdminRole(): AdminRoleData {
         });
       } catch (error) {
         console.error('Error fetching admin role:', error);
+        if (!mounted) return;
+
         setRoleData({
           role: null,
           isAdmin: false,
@@ -72,6 +82,10 @@ export function useAdminRole(): AdminRoleData {
     };
 
     fetchAdminRole();
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   return roleData;
