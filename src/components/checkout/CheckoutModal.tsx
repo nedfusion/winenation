@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, CreditCard, MapPin, User } from 'lucide-react';
+import { PaystackButton } from 'react-paystack';
 import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
 import { CartItem } from '../../types';
@@ -20,35 +21,37 @@ export default function CheckoutModal({
   const { user, profile } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
   const [shippingAddress, setShippingAddress] = useState(profile?.address || '');
+  const [phone, setPhone] = useState(profile?.phone || '');
+
+  const paystackKey = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY || '';
 
   if (!isOpen) return null;
 
   const total = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const totalInKobo = Math.round(total * 100);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user || !profile) return;
-
-    setLoading(true);
-    setError('');
+  const createOrder = async (paymentReference: string) => {
+    if (!user || !profile) return null;
 
     try {
-      // Create order
       const { data: order, error: orderError } = await supabase
         .from('orders')
         .insert({
           user_id: user.id,
           total_amount: total,
           shipping_address: shippingAddress,
-          status: 'pending'
+          status: 'processing',
+          payment_status: 'processing',
+          payment_method: 'paystack',
+          payment_reference: paymentReference
         })
         .select()
         .single();
 
       if (orderError) throw orderError;
 
-      // Create order items
       const orderItems = cartItems.map(item => ({
         order_id: order.id,
         product_id: item.id,
@@ -62,13 +65,66 @@ export default function CheckoutModal({
 
       if (itemsError) throw itemsError;
 
-      onOrderComplete();
-      onClose();
+      return order;
     } catch (error: any) {
-      setError(error.message);
+      console.error('Error creating order:', error);
+      throw error;
+    }
+  };
+
+  const handlePaymentSuccess = async (reference: any) => {
+    setLoading(true);
+    try {
+      const order = await createOrder(reference.reference);
+
+      if (order) {
+        await supabase
+          .from('orders')
+          .update({
+            payment_status: 'completed',
+            status: 'processing',
+            paid_at: new Date().toISOString()
+          })
+          .eq('id', order.id);
+
+        setSuccess(true);
+        setTimeout(() => {
+          onOrderComplete();
+          onClose();
+        }, 2000);
+      }
+    } catch (error: any) {
+      setError('Payment successful but order creation failed. Please contact support with reference: ' + reference.reference);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handlePaymentClose = () => {
+    setError('Payment cancelled');
+  };
+
+  const paystackConfig = {
+    email: profile?.email || '',
+    amount: totalInKobo,
+    publicKey: paystackKey,
+    text: 'Pay Now',
+    metadata: {
+      custom_fields: [
+        {
+          display_name: 'Customer Name',
+          variable_name: 'customer_name',
+          value: profile?.full_name || ''
+        },
+        {
+          display_name: 'Phone',
+          variable_name: 'phone',
+          value: phone
+        }
+      ]
+    },
+    onSuccess: handlePaymentSuccess,
+    onClose: handlePaymentClose
   };
 
   return (
@@ -84,10 +140,16 @@ export default function CheckoutModal({
             </button>
           </div>
           
-          <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          <div className="p-6 space-y-6">
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg">
                 {error}
+              </div>
+            )}
+
+            {success && (
+              <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
+                Payment successful! Your order has been placed.
               </div>
             )}
 
@@ -139,6 +201,19 @@ export default function CheckoutModal({
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50"
                   />
                 </div>
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Phone Number *
+                  </label>
+                  <input
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                    placeholder="080XXXXXXXX"
+                    required
+                  />
+                </div>
               </div>
             </div>
 
@@ -162,11 +237,12 @@ export default function CheckoutModal({
             <div>
               <h3 className="font-semibold text-gray-800 mb-3 flex items-center">
                 <CreditCard className="h-5 w-5 mr-2" />
-                Payment Information
+                Payment Method
               </h3>
-              <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-lg">
-                <p className="text-sm">
-                  Payment will be processed upon delivery. You can pay with cash or card when your order arrives.
+              <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
+                <p className="text-sm font-medium mb-2">Secure Payment with Paystack</p>
+                <p className="text-xs">
+                  Pay securely with your card, bank transfer, or USSD. Your payment information is encrypted and secure.
                 </p>
               </div>
             </div>
@@ -175,19 +251,28 @@ export default function CheckoutModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 border border-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-50 transition-colors"
+                disabled={loading || success}
+                className="flex-1 border border-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
               >
                 Cancel
               </button>
-              <button
-                type="submit"
-                disabled={loading || !shippingAddress.trim()}
-                className="flex-1 bg-red-600 text-white py-3 rounded-lg hover:bg-red-700 transition-colors font-medium disabled:opacity-50"
-              >
-                {loading ? 'Processing...' : 'Place Order'}
-              </button>
+              {paystackKey ? (
+                <PaystackButton
+                  {...paystackConfig}
+                  className="flex-1 bg-red-600 text-white py-3 rounded-lg hover:bg-red-700 transition-colors font-medium disabled:opacity-50"
+                  disabled={loading || success || !shippingAddress.trim() || !phone.trim()}
+                />
+              ) : (
+                <button
+                  type="button"
+                  disabled
+                  className="flex-1 bg-gray-400 text-white py-3 rounded-lg font-medium cursor-not-allowed"
+                >
+                  Payment Not Configured
+                </button>
+              )}
             </div>
-          </form>
+          </div>
         </div>
       </div>
     </div>

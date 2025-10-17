@@ -6,6 +6,10 @@ interface Order {
   id: string;
   user_id: string;
   status: string;
+  payment_status: string;
+  payment_method: string | null;
+  payment_reference: string | null;
+  paid_at: string | null;
   total_amount: number;
   shipping_address: string;
   created_at: string;
@@ -122,6 +126,23 @@ export default function OrderManager() {
     }
   };
 
+  const getPaymentStatusColor = (paymentStatus: string) => {
+    switch (paymentStatus) {
+      case 'pending':
+        return 'bg-gray-100 text-gray-800';
+      case 'processing':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'completed':
+        return 'bg-green-100 text-green-800';
+      case 'failed':
+        return 'bg-red-100 text-red-800';
+      case 'refunded':
+        return 'bg-orange-100 text-orange-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
   const filteredOrders = orders.filter(order => {
     const matchesSearch = 
       order.profiles.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -199,6 +220,9 @@ export default function OrderManager() {
                   Status
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Payment
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Date
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -239,6 +263,23 @@ export default function OrderManager() {
                       {getStatusIcon(order.status)}
                       <span className="ml-1 capitalize">{order.status}</span>
                     </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex flex-col space-y-1">
+                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getPaymentStatusColor(order.payment_status)}`}>
+                        {order.payment_status?.toUpperCase() || 'PENDING'}
+                      </span>
+                      {order.payment_method && (
+                        <span className="text-xs text-gray-500 capitalize">
+                          {order.payment_method}
+                        </span>
+                      )}
+                      {order.payment_reference && (
+                        <span className="text-xs text-gray-400">
+                          Ref: {order.payment_reference.substring(0, 8)}
+                        </span>
+                      )}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {new Date(order.created_at).toLocaleDateString()}
