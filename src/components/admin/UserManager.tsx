@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Shield, User } from 'lucide-react';
+import { Search, Shield, User, ChevronDown } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
 interface Profile {
@@ -9,6 +9,7 @@ interface Profile {
   phone: string | null;
   address: string | null;
   is_admin: boolean;
+  admin_role: string;
   created_at: string;
   updated_at: string;
 }
@@ -17,6 +18,7 @@ export default function UserManager() {
   const [users, setUsers] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [editingRole, setEditingRole] = useState<string | null>(null);
 
   useEffect(() => {
     fetchUsers();
@@ -40,20 +42,49 @@ export default function UserManager() {
 
   const toggleAdminStatus = async (userId: string, currentStatus: boolean) => {
     try {
+      const updates: any = {
+        is_admin: !currentStatus,
+        updated_at: new Date().toISOString()
+      };
+
+      if (!currentStatus) {
+        updates.admin_role = 'viewer';
+      }
+
       const { error } = await supabase
         .from('profiles')
-        .update({ is_admin: !currentStatus, updated_at: new Date().toISOString() })
+        .update(updates)
         .eq('id', userId);
 
       if (error) throw error;
-      
-      setUsers(users.map(user => 
-        user.id === userId 
-          ? { ...user, is_admin: !currentStatus }
+
+      setUsers(users.map(user =>
+        user.id === userId
+          ? { ...user, is_admin: !currentStatus, admin_role: !currentStatus ? 'viewer' : user.admin_role }
           : user
       ));
     } catch (error) {
       console.error('Error updating admin status:', error);
+    }
+  };
+
+  const updateAdminRole = async (userId: string, newRole: string) => {
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ admin_role: newRole, updated_at: new Date().toISOString() })
+        .eq('id', userId);
+
+      if (error) throw error;
+
+      setUsers(users.map(user =>
+        user.id === userId
+          ? { ...user, admin_role: newRole }
+          : user
+      ));
+      setEditingRole(null);
+    } catch (error) {
+      console.error('Error updating admin role:', error);
     }
   };
 
@@ -142,13 +173,41 @@ export default function UserManager() {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      user.is_admin 
-                        ? 'bg-purple-100 text-purple-800' 
-                        : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      {user.is_admin ? 'Admin' : 'Customer'}
-                    </span>
+                    <div className="flex flex-col space-y-1">
+                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                        user.is_admin
+                          ? 'bg-red-100 text-red-800'
+                          : 'bg-gray-100 text-gray-800'
+                      }`}>
+                        {user.is_admin ? 'Admin' : 'Customer'}
+                      </span>
+                      {user.is_admin && (
+                        <div className="relative">
+                          {editingRole === user.id ? (
+                            <select
+                              value={user.admin_role}
+                              onChange={(e) => updateAdminRole(user.id, e.target.value)}
+                              onBlur={() => setEditingRole(null)}
+                              autoFocus
+                              className="text-xs border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-red-500"
+                            >
+                              <option value="super_admin">Super Admin</option>
+                              <option value="product_manager">Product Manager</option>
+                              <option value="order_manager">Order Manager</option>
+                              <option value="viewer">Viewer</option>
+                            </select>
+                          ) : (
+                            <button
+                              onClick={() => setEditingRole(user.id)}
+                              className="inline-flex items-center space-x-1 text-xs text-blue-600 hover:text-blue-800"
+                            >
+                              <span className="capitalize">{user.admin_role?.replace('_', ' ') || 'viewer'}</span>
+                              <ChevronDown className="h-3 w-3" />
+                            </button>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {new Date(user.created_at).toLocaleDateString()}

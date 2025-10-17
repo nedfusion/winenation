@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Package, ShoppingBag, TrendingUp, Plus, CreditCard as Edit, Trash2, Eye, PackageCheck } from 'lucide-react';
+import { Users, Package, ShoppingBag, TrendingUp, Plus, CreditCard as Edit, Trash2, Eye, PackageCheck, Shield } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { useAdminRole } from '../../hooks/useAdminRole';
 import ProductManager from './ProductManager';
 import UserManager from './UserManager';
 import OrderManager from './OrderManager';
@@ -22,6 +23,7 @@ export default function AdminDashboard() {
     totalRevenue: 0
   });
   const [loading, setLoading] = useState(true);
+  const { role, canManageProducts, canManageOrders, canManageUsers, loading: roleLoading } = useAdminRole();
 
   useEffect(() => {
     fetchDashboardStats();
@@ -59,13 +61,15 @@ export default function AdminDashboard() {
     }
   };
 
-  const tabs = [
-    { id: 'overview', label: 'Overview', icon: TrendingUp },
-    { id: 'products', label: 'Products', icon: Package },
-    { id: 'stock', label: 'Stock Management', icon: PackageCheck },
-    { id: 'users', label: 'Users', icon: Users },
-    { id: 'orders', label: 'Orders', icon: ShoppingBag }
+  const availableTabs = [
+    { id: 'overview', label: 'Overview', icon: TrendingUp, permission: true },
+    { id: 'products', label: 'Products', icon: Package, permission: canManageProducts },
+    { id: 'stock', label: 'Stock Management', icon: PackageCheck, permission: canManageProducts },
+    { id: 'users', label: 'Users', icon: Users, permission: canManageUsers },
+    { id: 'orders', label: 'Orders', icon: ShoppingBag, permission: canManageOrders }
   ];
+
+  const tabs = availableTabs.filter(tab => tab.permission);
 
   const StatCard = ({ title, value, icon: Icon, color }: any) => (
     <div className="bg-white rounded-lg shadow-md p-6">
@@ -95,9 +99,22 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-          <p className="text-gray-600">Manage your WineNation store</p>
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+            <p className="text-gray-600">Manage your WineNation store</p>
+          </div>
+          {role && (
+            <div className="flex items-center space-x-2 bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-200">
+              <Shield className="h-5 w-5 text-red-600" />
+              <div>
+                <p className="text-xs text-gray-500">Role</p>
+                <p className="text-sm font-semibold text-gray-900 capitalize">
+                  {role.replace('_', ' ')}
+                </p>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Navigation Tabs */}
