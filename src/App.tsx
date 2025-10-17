@@ -269,6 +269,8 @@ function Shop() {
 function AdminRoute() {
   const { user, profile, loading } = useAuth();
 
+  console.log('AdminRoute - user:', user?.email, 'profile:', profile, 'loading:', loading);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -282,6 +284,7 @@ function AdminRoute() {
   }
 
   if (!profile?.is_admin) {
+    console.log('Access denied - profile:', profile);
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
         <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
@@ -292,6 +295,10 @@ function AdminRoute() {
           <p className="text-gray-600 mb-6">
             You do not have administrator privileges to access this page.
           </p>
+          <div className="text-xs text-gray-500 mb-4">
+            Debug: User ID: {user?.id}<br/>
+            Profile: {JSON.stringify(profile)}
+          </div>
           <button
             onClick={() => window.location.href = '/'}
             className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition-colors"
