@@ -26,7 +26,7 @@ Deno.serve(async (req: Request) => {
 
     const { email, password, fullName } = await req.json();
 
-    // Create auth user
+    // Create auth user (trigger will auto-create profile)
     const { data: authData, error: authError } = await supabase.auth.admin.createUser({
       email: email,
       password: password,
@@ -44,44 +44,20 @@ Deno.serve(async (req: Request) => {
       throw new Error('No user created');
     }
 
-    // Wait a bit for trigger to create profile
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    // Wait for trigger to create profile
+    await new Promise(resolve => setTimeout(resolve, 1500));
 
-    // Check if profile exists
-    const { data: existingProfile } = await supabase
+    // Update profile to grant super admin access
+    const { error: updateError } = await supabase
       .from('profiles')
-      .select('id')
-      .eq('id', authData.user.id)
-      .maybeSingle();
+      .update({
+        is_admin: true,
+        admin_role: 'super_admin'
+      })
+      .eq('id', authData.user.id);
 
-    if (existingProfile) {
-      // Update existing profile
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({
-          is_admin: true,
-          admin_role: 'super_admin'
-        })
-        .eq('id', authData.user.id);
-
-      if (updateError) {
-        throw new Error('Profile update error: ' + updateError.message);
-      }
-    } else {
-      // Create profile if it doesn't exist
-      const { error: insertError } = await supabase
-        .from('profiles')
-        .insert({
-          id: authData.user.id,
-          email: email,
-          full_name: fullName,
-          is_admin: true,
-          admin_role: 'super_admin'
-        });
-
-      if (insertError) {
-        throw new Error('Profile insert error: ' + insertError.message);
-      }
+    if (updateError) {
+      throw new Error('Profile update error: ' + updateError.message);
     }
 
     return new Response(
