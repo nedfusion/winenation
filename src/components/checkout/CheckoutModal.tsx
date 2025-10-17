@@ -3,7 +3,10 @@ import { X, CreditCard, MapPin, User } from 'lucide-react';
 import { PaystackButton } from 'react-paystack';
 import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
+import { transactpay } from '../../lib/transactpay';
 import { CartItem } from '../../types';
+
+type PaymentGateway = 'paystack' | 'transactpay';
 
 interface CheckoutModalProps {
   isOpen: boolean;
@@ -24,15 +27,17 @@ export default function CheckoutModal({
   const [success, setSuccess] = useState(false);
   const [shippingAddress, setShippingAddress] = useState(profile?.address || '');
   const [phone, setPhone] = useState(profile?.phone || '');
+  const [selectedGateway, setSelectedGateway] = useState<PaymentGateway>('transactpay');
 
   const paystackKey = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY || '';
+  const transactpayKey = import.meta.env.VITE_TRANSACTPAY_PUBLIC_KEY || '';
 
   if (!isOpen) return null;
 
   const total = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const totalInKobo = Math.round(total * 100);
 
-  const createOrder = async (paymentReference: string) => {
+  const createOrder = async (paymentReference: string, gateway: PaymentGateway) => {
     if (!user || !profile) return null;
 
     try {
@@ -44,7 +49,7 @@ export default function CheckoutModal({
           shipping_address: shippingAddress,
           status: 'processing',
           payment_status: 'processing',
-          payment_method: 'paystack',
+          payment_method: gateway,
           payment_reference: paymentReference
         })
         .select()
@@ -72,10 +77,10 @@ export default function CheckoutModal({
     }
   };
 
-  const handlePaymentSuccess = async (reference: any) => {
+  const handlePaystackSuccess = async (reference: any) => {
     setLoading(true);
     try {
-      const order = await createOrder(reference.reference);
+      const order = await createOrder(reference.reference, 'paystack');
 
       if (order) {
         await supabase
@@ -96,6 +101,50 @@ export default function CheckoutModal({
     } catch (error: any) {
       setError('Payment successful but order creation failed. Please contact support with reference: ' + reference.reference);
     } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleTransactpayPayment = async () => {
+    if (!user || !profile) return;
+
+    setLoading(true);
+    setError('');
+
+    try {
+      const reference = transactpay.generateReference();
+
+      const paymentData = {
+        amount: total,
+        email: profile.email,
+        reference: reference,
+        currency: 'NGN',
+        metadata: {
+          customer_name: profile.full_name || '',
+          phone: phone,
+          cart_items: cartItems.map(item => ({
+            name: item.name,
+            quantity: item.quantity,
+            price: item.price
+          }))
+        }
+      };
+
+      const order = await createOrder(reference, 'transactpay');
+
+      if (!order) {
+        throw new Error('Failed to create order');
+      }
+
+      const result = await transactpay.initializePayment(paymentData);
+
+      if (result.status && result.data?.authorization_url) {
+        transactpay.openPaymentModal(result.data.authorization_url);
+      } else {
+        throw new Error(result.message || 'Payment initialization failed');
+      }
+    } catch (error: any) {
+      setError(error.message || 'Failed to initialize payment');
       setLoading(false);
     }
   };
@@ -123,7 +172,7 @@ export default function CheckoutModal({
         }
       ]
     },
-    onSuccess: handlePaymentSuccess,
+    onSuccess: handlePaystackSuccess,
     onClose: handlePaymentClose
   };
 
@@ -233,16 +282,59 @@ export default function CheckoutModal({
               />
             </div>
 
-            {/* Payment Info */}
+            {/* Payment Gateway Selection */}
             <div>
               <h3 className="font-semibold text-gray-800 mb-3 flex items-center">
                 <CreditCard className="h-5 w-5 mr-2" />
                 Payment Method
               </h3>
-              <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
-                <p className="text-sm font-medium mb-2">Secure Payment with Paystack</p>
+              <div className="space-y-3">
+                {transactpayKey && (
+                  <label className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition-colors ${
+                    selectedGateway === 'transactpay'
+                      ? 'border-red-500 bg-red-50'
+                      : 'border-gray-200 hover:border-red-300'
+                  }`}>
+                    <input
+                      type="radio"
+                      name="payment-gateway"
+                      value="transactpay"
+                      checked={selectedGateway === 'transactpay'}
+                      onChange={(e) => setSelectedGateway(e.target.value as PaymentGateway)}
+                      className="h-4 w-4 text-red-600 focus:ring-red-500"
+                    />
+                    <div className="ml-3 flex-1">
+                      <p className="text-sm font-medium text-gray-900">Transactpay</p>
+                      <p className="text-xs text-gray-500">Pay with card, bank transfer, or USSD</p>
+                    </div>
+                  </label>
+                )}
+
+                {paystackKey && (
+                  <label className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition-colors ${
+                    selectedGateway === 'paystack'
+                      ? 'border-red-500 bg-red-50'
+                      : 'border-gray-200 hover:border-red-300'
+                  }`}>
+                    <input
+                      type="radio"
+                      name="payment-gateway"
+                      value="paystack"
+                      checked={selectedGateway === 'paystack'}
+                      onChange={(e) => setSelectedGateway(e.target.value as PaymentGateway)}
+                      className="h-4 w-4 text-red-600 focus:ring-red-500"
+                    />
+                    <div className="ml-3 flex-1">
+                      <p className="text-sm font-medium text-gray-900">Paystack</p>
+                      <p className="text-xs text-gray-500">Secure payment with Paystack</p>
+                    </div>
+                  </label>
+                )}
+              </div>
+
+              <div className="mt-3 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
                 <p className="text-xs">
-                  Pay securely with your card, bank transfer, or USSD. Your payment information is encrypted and secure.
+                  All payments are encrypted and secure. Your payment information is never stored.
                 </p>
               </div>
             </div>
@@ -256,7 +348,17 @@ export default function CheckoutModal({
               >
                 Cancel
               </button>
-              {paystackKey ? (
+
+              {selectedGateway === 'transactpay' && transactpayKey ? (
+                <button
+                  type="button"
+                  onClick={handleTransactpayPayment}
+                  disabled={loading || success || !shippingAddress.trim() || !phone.trim()}
+                  className="flex-1 bg-red-600 text-white py-3 rounded-lg hover:bg-red-700 transition-colors font-medium disabled:opacity-50"
+                >
+                  {loading ? 'Processing...' : 'Pay with Transactpay'}
+                </button>
+              ) : selectedGateway === 'paystack' && paystackKey ? (
                 <PaystackButton
                   {...paystackConfig}
                   className="flex-1 bg-red-600 text-white py-3 rounded-lg hover:bg-red-700 transition-colors font-medium disabled:opacity-50"
