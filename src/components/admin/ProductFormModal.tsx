@@ -212,11 +212,30 @@ export default function ProductFormModal({ isOpen, onClose, product, onSuccess }
     onClose();
   };
 
-  if (!isOpen) return null;
+  if (!isOpen) {
+    console.log('Modal not open - isOpen:', isOpen);
+    return null;
+  }
+
+  console.log('Modal rendering - isOpen:', isOpen, 'product:', product?.name);
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4" style={{ zIndex: 9999 }}>
-      <div className="bg-white rounded-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto relative">
+    <div
+      className="fixed inset-0 flex items-center justify-center p-4"
+      style={{
+        zIndex: 9999,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)'
+      }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          handleClose();
+        }
+      }}
+    >
+      <div
+        className="bg-white rounded-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto relative"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between">
           <h2 className="text-2xl font-bold text-gray-900">
             {product ? 'Edit Product' : 'Add New Product'}

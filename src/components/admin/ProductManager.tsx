@@ -185,9 +185,13 @@ export default function ProductManager() {
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex space-x-2">
                       <button
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          console.log('Edit button clicked for product:', product.name);
                           setEditingProduct(product);
                           setShowAddModal(true);
+                          console.log('Modal should be opening...');
                         }}
                         className="p-2 text-blue-600 hover:text-blue-900 hover:bg-blue-50 rounded-lg transition-colors"
                         title="Edit Product"
