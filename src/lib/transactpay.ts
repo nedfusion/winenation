@@ -29,10 +29,12 @@ export class TransactpayService {
   }
 
   async initializePayment(data: PaymentData): Promise<any> {
-    const url = `${TRANSACTPAY_BASE_URL}/v1/payment/initialize`;
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    const url = `${supabaseUrl}/functions/v1/transactpay-init`;
 
     const payload = {
       public_key: this.config.publicKey,
+      secret_key: this.config.secretKey,
       amount: data.amount,
       email: data.email,
       reference: data.reference,
@@ -41,25 +43,43 @@ export class TransactpayService {
       metadata: data.metadata || {}
     };
 
+    console.log('TransactPay: Initializing payment via edge function');
+    console.log('TransactPay: Payment data:', {
+      amount: data.amount,
+      email: data.email,
+      reference: data.reference,
+      currency: data.currency || 'NGN'
+    });
+
     try {
       const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.config.secretKey}`
+          'Accept': 'application/json'
         },
         body: JSON.stringify(payload)
       });
 
-      const result = await response.json();
+      console.log('TransactPay: Response status:', response.status);
 
-      if (!response.ok) {
-        throw new Error(result.message || 'Payment initialization failed');
+      const result = await response.json();
+      console.log('TransactPay: Response:', result);
+
+      if (!response.ok || !result.status) {
+        const errorMessage = result.message || result.error || 'Payment initialization failed';
+        console.error('TransactPay: Error:', errorMessage);
+        throw new Error(errorMessage);
       }
 
       return result;
-    } catch (error) {
-      console.error('Transactpay initialization error:', error);
+    } catch (error: any) {
+      console.error('TransactPay initialization error:', error);
+
+      if (error.message === 'Failed to fetch') {
+        throw new Error('Unable to connect to payment gateway. Please check your internet connection or try again later.');
+      }
+
       throw error;
     }
   }
