@@ -35,6 +35,7 @@ export class TransactpayService {
     const payload = {
       public_key: this.config.publicKey,
       secret_key: this.config.secretKey,
+      encryption_key: this.config.encryptionKey,
       amount: data.amount,
       email: data.email,
       reference: data.reference,
