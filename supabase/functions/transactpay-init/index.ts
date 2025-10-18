@@ -6,7 +6,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Client-Info, Apikey",
 };
 
-const TRANSACTPAY_API_URL = "https://api.transactpay.ai";
+const TRANSACTPAY_API_URL = "https://merchant.transactpay.ai";
 
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
