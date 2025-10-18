@@ -106,40 +106,22 @@ export default function CheckoutModal({
   };
 
   const handleTransactpayPayment = async () => {
-    if (!user || !profile) {
-      setError('User not authenticated');
-      return;
-    }
-
-    if (!shippingAddress.trim()) {
-      setError('Please enter your shipping address');
-      return;
-    }
-
-    if (!phone.trim()) {
-      setError('Please enter your phone number');
-      return;
-    }
+    if (!user || !profile) return;
 
     setLoading(true);
     setError('');
 
     try {
-      console.log('Starting TransactPay payment process...');
-
       const reference = transactpay.generateReference();
-      console.log('Generated reference:', reference);
 
       const paymentData = {
         amount: total,
         email: profile.email,
         reference: reference,
         currency: 'NGN',
-        callback_url: window.location.origin + '/payment/callback',
         metadata: {
           customer_name: profile.full_name || '',
           phone: phone,
-          shipping_address: shippingAddress,
           cart_items: cartItems.map(item => ({
             name: item.name,
             quantity: item.quantity,
@@ -148,33 +130,21 @@ export default function CheckoutModal({
         }
       };
 
-      console.log('Creating order...');
       const order = await createOrder(reference, 'transactpay');
 
       if (!order) {
-        throw new Error('Failed to create order. Please try again.');
+        throw new Error('Failed to create order');
       }
-
-      console.log('Order created:', order.id);
-      console.log('Initializing TransactPay payment...');
 
       const result = await transactpay.initializePayment(paymentData);
 
-      console.log('TransactPay result:', result);
-
       if (result.status && result.data?.authorization_url) {
-        console.log('Redirecting to payment page...');
         transactpay.openPaymentModal(result.data.authorization_url);
-      } else if (result.status && result.data?.payment_url) {
-        console.log('Redirecting to payment URL...');
-        transactpay.openPaymentModal(result.data.payment_url);
       } else {
-        console.error('Invalid response from TransactPay:', result);
-        throw new Error(result.message || 'Payment initialization failed. Please try again.');
+        throw new Error(result.message || 'Payment initialization failed');
       }
     } catch (error: any) {
-      console.error('TransactPay payment error:', error);
-      setError(error.message || 'Failed to initialize payment. Please try again.');
+      setError(error.message || 'Failed to initialize payment');
       setLoading(false);
     }
   };
