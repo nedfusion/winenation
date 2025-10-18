@@ -1,4 +1,4 @@
-const TRANSACTPAY_BASE_URL = 'https://merchant.transactpay.ai';
+const TRANSACTPAY_BASE_URL = 'https://payment-api-service.transactpay.ai';
 
 interface TransactpayConfig {
   publicKey: string;

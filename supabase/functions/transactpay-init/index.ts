@@ -6,7 +6,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Client-Info, Apikey",
 };
 
-const TRANSACTPAY_API_URL = "https://merchant.transactpay.ai";
+const TRANSACTPAY_API_URL = "https://payment-api-service.transactpay.ai";
 
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
@@ -44,16 +44,15 @@ Deno.serve(async (req: Request) => {
     });
 
     const response = await fetch(
-      `${TRANSACTPAY_API_URL}/v1/payment/initialize`,
+      `${TRANSACTPAY_API_URL}/payment/order/create`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${secret_key}`,
+          "api-key": public_key,
           "Accept": "application/json",
         },
         body: JSON.stringify({
-          public_key,
           amount,
           email,
           reference,
