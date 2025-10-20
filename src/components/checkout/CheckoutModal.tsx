@@ -160,29 +160,56 @@ export default function CheckoutModal({
 
       const result = await transactpay.initializePayment(paymentData);
 
-      console.log('TransactPay result:', result);
-      console.log('TransactPay data object:', result.data);
+      console.log('========== TRANSACTPAY RESPONSE DEBUG ==========');
+      console.log('Full result:', JSON.stringify(result, null, 2));
+      console.log('Result status:', result.status);
+      console.log('Result data:', result.data);
+      console.log('Data type:', typeof result.data);
+
+      if (result.data) {
+        console.log('Available fields in data:', Object.keys(result.data));
+        console.log('Data stringified:', JSON.stringify(result.data, null, 2));
+      }
+      console.log('================================================');
 
       if ((result.status === 'success' || result.status === true) && result.data) {
-        const paymentUrl = result.data.authorization_url
-                        || result.data.payment_url
-                        || result.data.authorizationUrl
-                        || result.data.paymentUrl
-                        || result.data.checkout_url
-                        || result.data.checkoutUrl
-                        || result.data.redirect_url
-                        || result.data.redirectUrl
-                        || result.data.url
-                        || result.data.link;
+        let paymentUrl = result.data.authorization_url
+                      || result.data.payment_url
+                      || result.data.authorizationUrl
+                      || result.data.paymentUrl
+                      || result.data.checkout_url
+                      || result.data.checkoutUrl
+                      || result.data.redirect_url
+                      || result.data.redirectUrl
+                      || result.data.url
+                      || result.data.link
+                      || result.data.paymentUrl
+                      || result.data.paymentLink
+                      || result.data.payment_link
+                      || result.data.PaymentUrl
+                      || result.data.PaymentLink;
+
+        if (!paymentUrl && typeof result.data === 'object') {
+          for (const key in result.data) {
+            const value = result.data[key];
+            if (typeof value === 'string' && (value.startsWith('http://') || value.startsWith('https://'))) {
+              console.log(`Found URL in field "${key}":`, value);
+              paymentUrl = value;
+              break;
+            }
+          }
+        }
 
         if (paymentUrl) {
-          console.log('Found payment URL:', paymentUrl);
+          console.log('✅ Found payment URL:', paymentUrl);
           console.log('Redirecting to payment page...');
           transactpay.openPaymentModal(paymentUrl);
         } else {
-          console.error('No payment URL found in response data:', result.data);
+          console.error('❌ No payment URL found in response');
+          console.error('Data object:', result.data);
           console.error('Available fields:', Object.keys(result.data));
-          throw new Error('Payment created but no payment URL received. Please contact support.');
+          console.error('Please share this console output for debugging');
+          throw new Error('Payment created but no payment URL received. Please share the console output with support.');
         }
       } else {
         console.error('Invalid response from TransactPay:', result);

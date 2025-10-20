@@ -1,10 +1,10 @@
 ╔══════════════════════════════════════════════════════════════════╗
-║         WINENATION - COMPLETE DEPLOYMENT PACKAGE                 ║
+║         WINENATION - ENHANCED DEBUG VERSION                      ║
 ║                                                                  ║
-║         👉 ASSETS FOLDER NOW INCLUDED! 👈                       ║
+║         👉 ENHANCED LOGGING TO FIND PAYMENT URL! 👈             ║
 ║                                                                  ║
-║         ✅ ALL 9 FILES VERIFIED!                                ║
-║         ✅ Assets folder with 3 files ✅                        ║
+║         ✅ AUTO-DETECTS ANY HTTP URL IN RESPONSE!               ║
+║         ✅ Shows complete response structure ✅                 ║
 ╚══════════════════════════════════════════════════════════════════╝
 
 📦 COMPLETE FILE LIST (9 FILES)
@@ -18,206 +18,273 @@ ROOT DIRECTORY (6 files):
   ✅ START-HERE.txt (this file)
   ✅ FILE-CHECKLIST.txt
 
-ASSETS FOLDER (3 files) ⭐ IMPORTANT!
-  ✅ assets/index-CKASGrub.js (530 KB) ⭐ LATEST!
+ASSETS FOLDER (3 files):
+  ✅ assets/index-DaFvXvHu.js (530 KB) ⭐ NEW!
   ✅ assets/index-BC9X9Dao.css (24 KB)
   ✅ assets/wines-C1PmgyJs.js (5.5 KB)
 
-Total: 9 files (~8.7 MB)
+IMPORTANT: New JavaScript file is index-DaFvXvHu.js
+Previous files to delete:
+  • index-CKASGrub.js
+  • index-BJOwXAIE.js
+  • index-BA5KQLKS.js
 
 
-⚠️ CRITICAL: ASSETS FOLDER STRUCTURE
+🎯 WHAT'S NEW - ENHANCED DEBUG MODE
 ═══════════════════════════════════════════════════════════════════
 
-When you extract the files, you MUST have this structure:
+Previous Error:
+  "Payment created but no payment URL received. Please contact support."
 
-your-website-root/
-  ├── index.html
-  ├── WINENATION Logo.jpg
-  ├── winenation video.mp4
-  ├── WhatsApp Video...mp4
-  └── assets/              ← FOLDER (create if missing!)
-      ├── index-CKASGrub.js
-      ├── index-BC9X9Dao.css
-      └── wines-C1PmgyJs.js
+Root Cause:
+  TransactPay response contains payment URL
+  But we don't know which field name they use
 
-If assets folder is missing after extraction:
-  1. Manually create "assets" folder
-  2. Move the 3 JS/CSS files into it
+New Features:
+  ✅ Enhanced logging shows ENTIRE response
+  ✅ Shows all available field names
+  ✅ Shows complete data structure as JSON
+  ✅ Automatically scans ALL fields for HTTP URLs
+  ✅ If ANY field contains http:// or https://, uses it!
+
+What You'll See in Console:
+  ========== TRANSACTPAY RESPONSE DEBUG ==========
+  Full result: {entire JSON response}
+  Result status: "success"
+  Result data: {data object}
+  Data type: "object"
+  Available fields in data: ["field1", "field2", ...]
+  Data stringified: {formatted JSON}
+  ================================================
+
+Then Either:
+  ✅ Found URL in field "fieldname": https://...
+  ✅ Found payment URL: https://...
+  ✅ Redirecting to payment page...
+
+Or:
+  ❌ No payment URL found in response
+  Available fields: [list of all fields]
+  → SHARE THIS OUTPUT WITH ME!
 
 
-📦 UPLOAD INSTRUCTIONS - STEP BY STEP
+📦 UPLOAD INSTRUCTIONS
 ═══════════════════════════════════════════════════════════════════
 
-STEP 1: Create Assets Folder
------------------------------
-On your hosting control panel (cPanel/FTP):
-  1. Go to your website root directory
-     (usually public_html, www, or htdocs)
-  2. Create NEW FOLDER named: assets
-  3. Verify folder is created
+STEP 1: Delete Old Files
+-------------------------
+Delete these old JavaScript files if present:
+  ❌ assets/index-CKASGrub.js
+  ❌ assets/index-BJOwXAIE.js
+  ❌ assets/index-BA5KQLKS.js
 
-STEP 2: Upload Root Files
---------------------------
-Upload these 6 files to website ROOT:
+Keep only the NEW file:
+  ✅ assets/index-DaFvXvHu.js
+
+STEP 2: Upload New Files
+-------------------------
+Upload to root directory:
   ☑️ index.html
   ☑️ WINENATION Logo.jpg
   ☑️ winenation video.mp4
   ☑️ WhatsApp Video...mp4
-  ☑️ START-HERE.txt (optional)
-  ☑️ FILE-CHECKLIST.txt (optional)
 
-STEP 3: Upload Assets Files
-----------------------------
-Upload these 3 files to assets FOLDER:
-  ☑️ index-CKASGrub.js (IMPORTANT!)
+Upload to assets/ folder:
+  ☑️ index-DaFvXvHu.js (NEW!)
   ☑️ index-BC9X9Dao.css
   ☑️ wines-C1PmgyJs.js
 
-STEP 4: Verify Structure
--------------------------
-Check your server has:
-  ✓ Root: 6 files
-  ✓ assets/: 3 files
-  ✓ Total: 9 files
+STEP 3: Clear Cache
+--------------------
+  1. Ctrl+Shift+Delete (all time)
+  2. Clear everything
+  3. Close browser
+  4. Reopen
+  5. Hard refresh 50+ times
 
-STEP 5: Clear Browser Cache
-----------------------------
-  1. Press Ctrl+Shift+Delete
-  2. Select "All time"
-  3. Check ALL boxes
-  4. Clear data
-  5. Close browser
-  6. Reopen and hard refresh 50+ times
-
-STEP 6: Test Payment
----------------------
-  1. Open console (F12)
-  2. Browse products
-  3. Add to cart
-  4. Checkout
-  5. Fill shipping address + phone
-  6. Pay with Transactpay
-  7. Should redirect to payment page!
+STEP 4: Test with Console OPEN
+-------------------------------
+CRITICAL: Console must be open BEFORE testing!
+  1. Press F12 BEFORE going to website
+  2. Click Console tab
+  3. Keep it visible
+  4. Now browse website
+  5. Proceed to checkout
+  6. Fill shipping + phone (REQUIRED!)
+  7. Select Transactpay
+  8. Click "Pay with Transactpay"
+  9. WATCH the console output!
 
 
-🎯 ALL FIXES INCLUDED
+🧪 WHAT TO LOOK FOR IN CONSOLE
 ═══════════════════════════════════════════════════════════════════
 
-✓ PKCS#1 v1.5 Encryption (verified)
+You'll see a big debug block:
+  ========== TRANSACTPAY RESPONSE DEBUG ==========
+  Full result: {
+    "status": "success",
+    "statusCode": "01",
+    "message": "Created order successfully",
+    "data": {
+      ...all the fields...
+    }
+  }
+
+Key Information to Look For:
+  1. "Available fields in data:" - Shows field names
+  2. "Data stringified:" - Shows values
+  3. Look for ANY field that contains "https://"
+
+If Payment Works:
+  ✅ You'll see: "Found URL in field..."
+  ✅ Browser will redirect to TransactPay
+
+If Payment Fails:
+  ❌ You'll see: "No payment URL found"
+  ❌ Take screenshot of ENTIRE console
+  ❌ Share the console output with me
+  ❌ I need to see the "Available fields" and "Data stringified"
+
+
+🔍 AUTO URL DETECTION
+═══════════════════════════════════════════════════════════════════
+
+The code now automatically scans ALL fields in the response.
+
+If ANY field contains a URL (starts with http:// or https://), it will:
+  1. Log: "Found URL in field 'fieldname': https://..."
+  2. Use that URL for redirect
+  3. Open TransactPay payment page
+
+This means it doesn't matter what TransactPay names the field!
+  • Could be "payment_url"
+  • Could be "authUrl"
+  • Could be "checkoutLink"
+  • Could be anything!
+
+As long as the value is a URL, we'll find it!
+
+
+💡 TROUBLESHOOTING GUIDE
+═══════════════════════════════════════════════════════════════════
+
+Scenario 1: Payment Still Doesn't Work
+---------------------------------------
+Action Required:
+  1. Open console (F12) BEFORE testing
+  2. Try payment
+  3. Look for the debug block in console
+  4. Find "Data stringified:" section
+  5. Copy the ENTIRE console output
+  6. Share with me - I need to see:
+     • The full JSON response
+     • All available field names
+     • All field values
+
+This will tell me EXACTLY what TransactPay returns!
+
+Scenario 2: No Debug Output in Console
+---------------------------------------
+Possible Causes:
+  • Using old JavaScript file
+  • Cache not cleared
+  • Wrong file uploaded
+
+Solution:
+  1. Verify index-DaFvXvHu.js is in assets folder
+  2. Check file size is ~530 KB
+  3. Delete any old index-*.js files
+  4. Clear cache COMPLETELY
+  5. Hard refresh 50+ times
+  6. Try again
+
+Scenario 3: Console Shows "Available fields: []"
+-------------------------------------------------
+This means result.data is empty!
+
+Possible Causes:
+  • API error occurred
+  • Response structure different
+  • Look for error messages above
+
+Action:
+  • Screenshot the ENTIRE console
+  • Share the full response JSON
+  • Check for error messages
+
+Scenario 4: URL Found But Not Redirecting
+------------------------------------------
+Check:
+  • Browser popup blocker
+  • Browser security settings
+  • Console for JavaScript errors
+
+
+📊 ENHANCED FEATURES
+═══════════════════════════════════════════════════════════════════
+
+1. Complete Response Logging
+   Shows the ENTIRE TransactPay response as formatted JSON
+
+2. Field Name Detection
+   Lists all field names in the data object
+
+3. Automatic URL Scanner
+   Scans every field for HTTP/HTTPS URLs
+   Uses the first URL found
+
+4. Better Error Messages
+   Tells you exactly what's in the response
+   Helps identify the problem quickly
+
+5. Debug Instructions
+   Guides you on what to share for support
+
+
+🎯 NEXT STEPS
+═══════════════════════════════════════════════════════════════════
+
+1. Upload new files (especially index-DaFvXvHu.js!)
+2. Delete old JavaScript files
+3. Clear cache completely
+4. Open console (F12) BEFORE testing
+5. Try payment
+6. Watch console output
+
+Then Either:
+  ✅ Payment works → Success!
+  ❌ Payment fails → Share console output with me
+
+The console output will show me EXACTLY what TransactPay returns,
+and I can update the code to handle their specific field names!
+
+
+✅ ALL PREVIOUS FIXES STILL INCLUDED
+═══════════════════════════════════════════════════════════════════
+
+✓ PKCS#1 v1.5 encryption
+✓ Correct API endpoint
 ✓ Correct payload structure (customer/order/payment)
-✓ Flexible URL detection (10 field variations)
-✓ Enhanced console logging
-✓ Required fields (shipping + phone)
+✓ Shipping address required
+✓ Phone number required
 
-
-⚠️ IF ASSETS FOLDER IS MISSING
-═══════════════════════════════════════════════════════════════════
-
-Some extraction tools may not create the assets folder.
-
-Manual Fix:
-  1. Go to your website root
-  2. Create folder named "assets" (lowercase!)
-  3. Look for these 3 files in root:
-     • index-CKASGrub.js
-     • index-BC9X9Dao.css
-     • wines-C1PmgyJs.js
-  4. MOVE (not copy) them into assets folder
-  5. Final structure:
-     Root: index.html + media files
-     assets/: 3 JS/CSS files
-
-
-🧪 TESTING CHECKLIST
-═══════════════════════════════════════════════════════════════════
-
-Before Testing:
-  [ ] All 9 files uploaded
-  [ ] Assets folder exists
-  [ ] 3 files inside assets folder
-  [ ] Browser cache cleared
-  [ ] Hard refreshed 50+ times
-
-During Testing:
-  [ ] Console open (F12)
-  [ ] Console tab visible
-  [ ] Shipping address filled
-  [ ] Phone number filled
-  [ ] Watch console logs
-
-Expected Result:
-  ✓ "Found payment URL: ..."
-  ✓ "Redirecting to payment page..."
-  ✓ Browser redirects to TransactPay
-  ✓ Payment form appears
-  ✓ Can enter card details
-  ✓ Success!
-
-
-❓ TROUBLESHOOTING
-═══════════════════════════════════════════════════════════════════
-
-Problem: Website shows blank page
-Solution:
-  • Check assets folder exists
-  • Check 3 files are inside assets folder
-  • Check index.html is in root
-  • Clear cache and refresh
-
-Problem: Assets folder missing after extraction
-Solution:
-  • Manually create "assets" folder
-  • Move 3 JS/CSS files into it
-  • Folder name must be lowercase: "assets"
-
-Problem: Files are in wrong location
-Solution:
-  • Root should have: index.html + media
-  • assets/ should have: 3 JS/CSS files
-  • Move files if needed
-
-Problem: Payment not working
-Solution:
-  • Verify index-CKASGrub.js is in assets folder
-  • Check file size is ~530 KB
-  • Clear cache completely
-  • Open console to see error messages
-
-
-📊 FILE SIZES FOR VERIFICATION
-═══════════════════════════════════════════════════════════════════
-
-Root Files:
-  • index.html: ~1.5 KB
-  • WINENATION Logo.jpg: ~26 KB
-  • winenation video.mp4: ~4.2 MB
-  • WhatsApp Video...mp4: ~4.2 MB
-
-Assets Files:
-  • index-CKASGrub.js: ~530 KB ← VERIFY THIS!
-  • index-BC9X9Dao.css: ~24 KB
-  • wines-C1PmgyJs.js: ~5.5 KB
-
-If file sizes don't match, re-upload that file.
-
-
-✅ DEPLOYMENT READY
-═══════════════════════════════════════════════════════════════════
-
-Status: ALL FILES PRESENT ✅
-Assets Folder: INCLUDED ✅
-All Fixes: VERIFIED ✅
-
-Upload → Create assets folder → Clear cache → Test!
+Plus NEW:
+✓ Enhanced debug logging
+✓ Automatic URL detection
+✓ Shows complete response
+✓ Better error messages
 
 
 ═══════════════════════════════════════════════════════════════════
         🍷 WineNation - Premium Beverage Collection 🍷
-              Build: Oct 20, 2025 11:50 UTC
-              Version: v7-FIXED (Assets Included)
+              Build: Oct 20, 2025 12:10 UTC
+              Version: v8-DEBUG (Enhanced Logging)
 
-        ✅ Assets folder structure fixed!
-        ✅ All 9 files present!
-        ✅ Ready to deploy!
+        ✅ Enhanced console logging!
+        ✅ Auto URL detection!
+        ✅ Shows complete response structure!
+
+        FILE: index-DaFvXvHu.js ← NEWEST!
+
+        STATUS: DEBUG MODE ENABLED 🔍
 ═══════════════════════════════════════════════════════════════════

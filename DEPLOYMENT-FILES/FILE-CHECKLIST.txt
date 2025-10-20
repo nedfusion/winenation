@@ -1,72 +1,81 @@
 ╔══════════════════════════════════════════════════════════════════╗
-║              QUICK FILE VERIFICATION CHECKLIST                   ║
-║                   ✅ ASSETS FOLDER INCLUDED ✅                   ║
+║              DEBUG VERSION - FILE CHECKLIST                      ║
+║                   ✅ AUTO URL DETECTION ✅                       ║
 ╚══════════════════════════════════════════════════════════════════╝
 
 📦 9 FILES TOTAL
 ═══════════════════════════════════════════════════════════════════
 
 ROOT (6 files):
-  [ ] index.html (1.5 KB)
-  [ ] WINENATION Logo.jpg (26 KB)
-  [ ] winenation video.mp4 (4.2 MB)
-  [ ] WhatsApp Video...mp4 (4.2 MB)
-  [ ] START-HERE.txt
-  [ ] FILE-CHECKLIST.txt
+  ✅ index.html (1.5 KB)
+  ✅ WINENATION Logo.jpg (26 KB)
+  ✅ winenation video.mp4 (4.2 MB)
+  ✅ WhatsApp Video...mp4 (4.2 MB)
+  ✅ START-HERE.txt
+  ✅ FILE-CHECKLIST.txt
 
-ASSETS FOLDER (3 files):
-  [ ] assets/index-CKASGrub.js (530 KB) ⭐
-  [ ] assets/index-BC9X9Dao.css (24 KB)
-  [ ] assets/wines-C1PmgyJs.js (5.5 KB)
+ASSETS (3 files):
+  ✅ assets/index-DaFvXvHu.js (530 KB) ⭐ NEW!
+  ✅ assets/index-BC9X9Dao.css (24 KB)
+  ✅ assets/wines-C1PmgyJs.js (5.5 KB)
 
 
-⚠️ CRITICAL: FOLDER STRUCTURE
+⚠️ DELETE OLD FILES
 ═══════════════════════════════════════════════════════════════════
 
-Your server MUST have:
-  your-website-root/
-    ├── index.html
-    ├── WINENATION Logo.jpg
-    ├── winenation video.mp4
-    ├── WhatsApp Video...mp4
-    └── assets/
-        ├── index-CKASGrub.js
-        ├── index-BC9X9Dao.css
-        └── wines-C1PmgyJs.js
+Remove these if present:
+  ❌ assets/index-CKASGrub.js
+  ❌ assets/index-BJOwXAIE.js
+  ❌ assets/index-BA5KQLKS.js
+
+Only keep:
+  ✅ assets/index-DaFvXvHu.js
 
 
-✅ UPLOAD CHECKLIST
+🎯 WHAT'S NEW
 ═══════════════════════════════════════════════════════════════════
 
-[ ] Step 1: Create "assets" folder on server
-[ ] Step 2: Upload 6 files to root
-[ ] Step 3: Upload 3 files to assets folder
-[ ] Step 4: Verify all 9 files present
-[ ] Step 5: Clear browser cache completely
-[ ] Step 6: Hard refresh 50+ times
-[ ] Step 7: Open console (F12)
-[ ] Step 8: Test payment
+Enhanced Debug Logging:
+  ✓ Shows complete TransactPay response
+  ✓ Lists all field names
+  ✓ Shows all field values
+  ✓ Auto-detects ANY HTTP URL in response
+
+Auto URL Detection:
+  ✓ Scans ALL fields for URLs
+  ✓ Uses first URL found
+  ✓ Works regardless of field name
 
 
-🎯 KEY FILE TO VERIFY
+🧪 TESTING INSTRUCTIONS
 ═══════════════════════════════════════════════════════════════════
 
-MOST IMPORTANT FILE:
-  assets/index-CKASGrub.js (~530 KB)
+CRITICAL: Open console (F12) BEFORE testing!
 
-This file contains ALL the TransactPay fixes!
+Steps:
+  1. Upload all 9 files
+  2. Delete old JS files
+  3. Clear cache completely
+  4. Press F12 (opens console)
+  5. Keep console visible
+  6. Try payment
+  7. Watch console output
 
-If this file is in the wrong location or missing:
-  ❌ Website will not work
-  ❌ Payment will fail
+If Payment Fails:
+  → Take screenshot of ENTIRE console
+  → Share the "Data stringified:" section
+  → I need to see what TransactPay returns!
 
-Verify:
-  ✓ File is in assets/ folder (not root)
-  ✓ Filename is exactly: index-CKASGrub.js
-  ✓ File size is ~530 KB
+
+✅ STATUS
+═══════════════════════════════════════════════════════════════════
+
+File: index-DaFvXvHu.js (NEW)
+Features: Auto URL detection + enhanced logging
+Status: READY TO DEPLOY ✅
 
 
 ═══════════════════════════════════════════════════════════════════
-      ASSETS FOLDER MUST EXIST WITH 3 FILES!
-      STATUS: READY TO DEPLOY ✅
+      OPEN CONSOLE (F12) BEFORE TESTING!
+      SHARE CONSOLE OUTPUT IF PAYMENT FAILS!
 ═══════════════════════════════════════════════════════════════════
