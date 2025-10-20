@@ -132,6 +132,8 @@ Deno.serve(async (req: Request) => {
       public_key,
       secret_key,
       encryption_key,
+      customer_name,
+      phone,
     } = await req.json();
 
     if (!public_key || !secret_key) {
@@ -153,13 +155,27 @@ Deno.serve(async (req: Request) => {
       currency,
     });
 
+    const nameParts = (customer_name || "Customer").split(" ");
+    const firstname = nameParts[0] || "Customer";
+    const lastname = nameParts.slice(1).join(" ") || "User";
+
     const payloadData = {
-      amount,
-      email,
-      reference,
-      currency: currency || "NGN",
-      callback_url: callback_url || "",
-      metadata: metadata || {},
+      customer: {
+        firstname: firstname,
+        lastname: lastname,
+        mobile: phone || "+234",
+        country: "NG",
+        email: email,
+      },
+      order: {
+        amount: amount,
+        reference: reference,
+        description: metadata?.description || "Payment for order",
+        currency: currency || "NGN",
+      },
+      payment: {
+        RedirectUrl: callback_url || "",
+      },
     };
 
     console.log("Encrypting payload with PKCS#1 v1.5...");

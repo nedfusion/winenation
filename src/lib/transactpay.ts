@@ -41,7 +41,9 @@ export class TransactpayService {
       reference: data.reference,
       currency: data.currency || 'NGN',
       callback_url: data.callback_url || window.location.origin + '/payment/callback',
-      metadata: data.metadata || {}
+      metadata: data.metadata || {},
+      customer_name: data.metadata?.customer_name || 'Customer',
+      phone: data.metadata?.phone || '+234'
     };
 
     console.log('TransactPay: Initializing payment via edge function');
