@@ -161,13 +161,29 @@ export default function CheckoutModal({
       const result = await transactpay.initializePayment(paymentData);
 
       console.log('TransactPay result:', result);
+      console.log('TransactPay data object:', result.data);
 
-      if (result.status && result.data?.authorization_url) {
-        console.log('Redirecting to payment page...');
-        transactpay.openPaymentModal(result.data.authorization_url);
-      } else if (result.status && result.data?.payment_url) {
-        console.log('Redirecting to payment URL...');
-        transactpay.openPaymentModal(result.data.payment_url);
+      if ((result.status === 'success' || result.status === true) && result.data) {
+        const paymentUrl = result.data.authorization_url
+                        || result.data.payment_url
+                        || result.data.authorizationUrl
+                        || result.data.paymentUrl
+                        || result.data.checkout_url
+                        || result.data.checkoutUrl
+                        || result.data.redirect_url
+                        || result.data.redirectUrl
+                        || result.data.url
+                        || result.data.link;
+
+        if (paymentUrl) {
+          console.log('Found payment URL:', paymentUrl);
+          console.log('Redirecting to payment page...');
+          transactpay.openPaymentModal(paymentUrl);
+        } else {
+          console.error('No payment URL found in response data:', result.data);
+          console.error('Available fields:', Object.keys(result.data));
+          throw new Error('Payment created but no payment URL received. Please contact support.');
+        }
       } else {
         console.error('Invalid response from TransactPay:', result);
         throw new Error(result.message || 'Payment initialization failed. Please try again.');
