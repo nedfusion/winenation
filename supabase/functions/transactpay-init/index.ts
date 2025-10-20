@@ -8,6 +8,55 @@ const corsHeaders = {
 
 const TRANSACTPAY_API_URL = "https://payment-api-service.transactpay.ai";
 
+function base64ToArrayBuffer(base64: string): Uint8Array {
+  const binaryString = atob(base64);
+  const bytes = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  return bytes;
+}
+
+function arrayBufferToBase64(buffer: Uint8Array): string {
+  let binary = '';
+  for (let i = 0; i < buffer.length; i++) {
+    binary += String.fromCharCode(buffer[i]);
+  }
+  return btoa(binary);
+}
+
+function bigIntToBytes(bigInt: bigint, length: number): Uint8Array {
+  const bytes = new Uint8Array(length);
+  let value = bigInt;
+  for (let i = length - 1; i >= 0; i--) {
+    bytes[i] = Number(value & 0xFFn);
+    value = value >> 8n;
+  }
+  return bytes;
+}
+
+function bytesToBigInt(bytes: Uint8Array): bigint {
+  let result = 0n;
+  for (let i = 0; i < bytes.length; i++) {
+    result = (result << 8n) | BigInt(bytes[i]);
+  }
+  return result;
+}
+
+function modPow(base: bigint, exponent: bigint, modulus: bigint): bigint {
+  if (modulus === 1n) return 0n;
+  let result = 1n;
+  base = base % modulus;
+  while (exponent > 0n) {
+    if (exponent % 2n === 1n) {
+      result = (result * base) % modulus;
+    }
+    exponent = exponent >> 1n;
+    base = (base * base) % modulus;
+  }
+  return result;
+}
+
 async function encryptPayload(data: any, encryptionKey: string): Promise<string> {
   try {
     const pemKey = atob(encryptionKey);
@@ -22,42 +71,42 @@ async function encryptPayload(data: any, encryptionKey: string): Promise<string>
     const modulusBase64 = modulusMatch[1];
     const exponentBase64 = exponentMatch[1];
 
-    const modulus = Uint8Array.from(atob(modulusBase64), c => c.charCodeAt(0));
-    const exponent = Uint8Array.from(atob(exponentBase64), c => c.charCodeAt(0));
+    const modulusBytes = base64ToArrayBuffer(modulusBase64);
+    const exponentBytes = base64ToArrayBuffer(exponentBase64);
 
-    const publicKey = await crypto.subtle.importKey(
-      "jwk",
-      {
-        kty: "RSA",
-        n: btoa(String.fromCharCode(...modulus)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, ''),
-        e: btoa(String.fromCharCode(...exponent)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, ''),
-        alg: "RSA-OAEP-256",
-        ext: true,
-      },
-      {
-        name: "RSA-OAEP",
-        hash: "SHA-256",
-      },
-      false,
-      ["encrypt"]
-    );
+    const modulus = bytesToBigInt(modulusBytes);
+    const exponent = bytesToBigInt(exponentBytes);
+    const keyLength = modulusBytes.length;
 
     const jsonString = JSON.stringify(data);
-    const encoder = new TextEncoder();
-    const dataBuffer = encoder.encode(jsonString);
+    const messageBytes = new TextEncoder().encode(jsonString);
 
-    const encryptedBuffer = await crypto.subtle.encrypt(
-      {
-        name: "RSA-OAEP",
-      },
-      publicKey,
-      dataBuffer
-    );
+    if (messageBytes.length > keyLength - 11) {
+      throw new Error("Message too long for RSA encryption");
+    }
 
-    const encryptedArray = new Uint8Array(encryptedBuffer);
-    const encryptedBase64 = btoa(String.fromCharCode(...encryptedArray));
+    const psLength = keyLength - messageBytes.length - 3;
+    const ps = new Uint8Array(psLength);
+    for (let i = 0; i < psLength; i++) {
+      let byte;
+      do {
+        byte = Math.floor(Math.random() * 255) + 1;
+      } while (byte === 0);
+      ps[i] = byte;
+    }
 
-    return encryptedBase64;
+    const em = new Uint8Array(keyLength);
+    em[0] = 0x00;
+    em[1] = 0x02;
+    em.set(ps, 2);
+    em[2 + psLength] = 0x00;
+    em.set(messageBytes, 3 + psLength);
+
+    const m = bytesToBigInt(em);
+    const c = modPow(m, exponent, modulus);
+    const encryptedBytes = bigIntToBytes(c, keyLength);
+
+    return arrayBufferToBase64(encryptedBytes);
   } catch (error) {
     console.error("Encryption error:", error);
     throw new Error(`Failed to encrypt payload: ${error.message}`);
@@ -113,7 +162,7 @@ Deno.serve(async (req: Request) => {
       metadata: metadata || {},
     };
 
-    console.log("Encrypting payload...");
+    console.log("Encrypting payload with PKCS#1 v1.5...");
     const encryptedData = await encryptPayload(payloadData, encryption_key);
     console.log("Payload encrypted successfully");
 
