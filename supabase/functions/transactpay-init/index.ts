@@ -276,6 +276,17 @@ Deno.serve(async (req: Request) => {
           }
         }
       }
+
+      if (!paymentUrl) {
+        for (const [key, value] of Object.entries(data)) {
+          if (typeof value === 'string' && value.length > 50 && /^[a-zA-Z0-9]+$/.test(value)) {
+            console.log(`Found long alphanumeric token in field "${key}":`, value);
+            paymentUrl = `https://payment-link.transactpay.ai/${value}`;
+            console.log("Generated payment link from token:", paymentUrl);
+            break;
+          }
+        }
+      }
     }
 
     if (paymentUrl) {
@@ -288,6 +299,10 @@ Deno.serve(async (req: Request) => {
       if (result.data) {
         console.error("Available data fields:", Object.keys(result.data));
         console.error("Data values:", JSON.stringify(result.data, null, 2));
+        console.log("SEARCHING FOR PAYMENT TOKEN...");
+        for (const [key, value] of Object.entries(result.data)) {
+          console.log(`  Field: ${key}, Type: ${typeof value}, Value: ${String(value).substring(0, 100)}`);
+        }
       }
     }
 

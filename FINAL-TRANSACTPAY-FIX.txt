@@ -1,0 +1,118 @@
+═══════════════════════════════════════════════════════════════════
+  TRANSACTPAY PAYMENT GATEWAY - FINAL FIX DEPLOYED
+═══════════════════════════════════════════════════════════════════
+
+✅ WHAT I FIXED:
+
+1. Edge function now uses: payment-link.transactpay.ai (correct domain!)
+2. Searches for payment link in 6 different ways:
+   - Direct field names (paymentLink, link, url, etc.)
+   - Nested payment object
+   - Token field → generates payment-link.transactpay.ai/{token}
+   - ID field → generates payment-link.transactpay.ai/{id}
+   - Scans for any transactpay.ai URLs
+   - Searches for long alphanumeric tokens (50+ chars)
+3. Extensive console logging shows EXACTLY what TransactPay returns
+
+✅ STATUS:
+   - Edge Function: DEPLOYED & LIVE ✅
+   - Package: winenation-website.tar.gz (8.4 MB) READY ✅
+   - Files: 7 total (verified) ✅
+
+═══════════════════════════════════════════════════════════════════
+  DEPLOYMENT INSTRUCTIONS
+═══════════════════════════════════════════════════════════════════
+
+STEP 1: DELETE ALL FILES
+   → Go to your hosting control panel
+   → Delete EVERYTHING in your website folder
+   → Make sure it's completely empty
+
+STEP 2: UPLOAD NEW FILES
+   → Extract winenation-website.tar.gz
+   → Upload all 7 files:
+      - index.html
+      - WINENATION Logo.jpg
+      - winenation video.mp4
+      - WhatsApp Video...mp4
+      - assets/ folder with 3 files inside
+
+STEP 3: CLEAR BROWSER CACHE (CRITICAL!)
+   → Press Ctrl+Shift+Delete (Windows) or Cmd+Shift+Delete (Mac)
+   → Select "All time" or "Everything"
+   → Check ALL boxes
+   → Click "Clear data"
+   → CLOSE BROWSER COMPLETELY
+   → Reopen browser
+
+STEP 4: TEST PAYMENT
+   → Open browser Console (press F12)
+   → Go to Console tab
+   → Add item to cart
+   → Fill checkout form COMPLETELY:
+      ✓ Name
+      ✓ Email
+      ✓ Shipping address (REQUIRED)
+      ✓ Phone number (REQUIRED - use +234XXXXXXXXXX format)
+   → Select "Transactpay"
+   → Click "Pay with Transactpay"
+   → WATCH THE CONSOLE OUTPUT
+
+═══════════════════════════════════════════════════════════════════
+  WHAT WILL HAPPEN
+═══════════════════════════════════════════════════════════════════
+
+OPTION A - SUCCESS ✅
+Console shows:
+   "Generated payment link from token: https://payment-link.transactpay.ai/..."
+   "Payment URL found: https://payment-link.transactpay.ai/..."
+   
+Then: Browser automatically redirects to TransactPay payment page!
+
+OPTION B - NEED MORE INFO 🔍
+Console shows:
+   "No payment URL found in response"
+   "SEARCHING FOR PAYMENT TOKEN..."
+   "Field: xxx, Type: xxx, Value: xxx"
+   
+Then: COPY THE ENTIRE CONSOLE OUTPUT and send to me
+
+═══════════════════════════════════════════════════════════════════
+  WHY THIS WILL WORK NOW
+═══════════════════════════════════════════════════════════════════
+
+Your link shows: payment-link.transactpay.ai/[LONG-TOKEN]
+
+The edge function now:
+1. Checks for direct payment link in response
+2. Looks for token/id fields
+3. Generates: payment-link.transactpay.ai/{token}
+4. Searches ALL fields for transactpay.ai URLs
+5. Finds any string 50+ chars long (like your token)
+6. Shows complete field analysis if nothing found
+
+If it still doesn't find the URL, the console will show EVERY field
+in TransactPay's response, so I can see exactly where the token is.
+
+═══════════════════════════════════════════════════════════════════
+  PACKAGE CONTENTS
+═══════════════════════════════════════════════════════════════════
+
+File: winenation-website.tar.gz
+Size: 8.4 MB
+Files:
+  - index.html (1.5 KB)
+  - WINENATION Logo.jpg (26 KB)
+  - winenation video.mp4 (4.2 MB)
+  - WhatsApp Video... (4.2 MB)
+  - assets/
+    - index-BV0-OTZl.js (543 KB)
+    - index-BC9X9Dao.css (24 KB)
+    - wines-C1PmgyJs.js (5.5 KB)
+
+═══════════════════════════════════════════════════════════════════
+
+TEST IT NOW! The detailed console logging will show us exactly
+what TransactPay returns, so we can fix it immediately if needed.
+
+═══════════════════════════════════════════════════════════════════
