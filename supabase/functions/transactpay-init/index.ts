@@ -206,9 +206,7 @@ Deno.serve(async (req: Request) => {
       result = JSON.parse(responseText);
     } catch (e) {
       console.error("Failed to parse TransactPay response:", responseText);
-      throw new Error(
-        `Invalid response from payment gateway: ${responseText.substring(0, 100)}`
-      );
+      throw new Error("Invalid response from payment gateway");
     }
 
     if (!response.ok) {
@@ -218,40 +216,78 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    console.log("========== RESPONSE STRUCTURE DEBUG ==========");
+    console.log("========== TRANSACTPAY API RESPONSE DEBUG ==========");
+    console.log("Response status:", response.status);
     console.log("Full result keys:", Object.keys(result));
+    console.log("Full result:", JSON.stringify(result, null, 2));
+
     if (result.data) {
       console.log("result.data keys:", Object.keys(result.data));
-      console.log("result.data full:", JSON.stringify(result.data, null, 2));
+      console.log("result.data:", JSON.stringify(result.data, null, 2));
     }
-    console.log("==============================================");
+    console.log("====================================================");
 
-    if (result.data && result.data.payment && result.data.payment.checkoutUrl) {
-      result.data.payment_url = result.data.payment.checkoutUrl;
-      console.log("Found payment URL in result.data.payment.checkoutUrl");
-    } else if (result.data && result.data.id) {
-      const checkoutUrl = `https://checkout.transactpay.ai/?ref=${result.data.id}`;
-      result.data.payment_url = checkoutUrl;
-      console.log("Generated checkout URL from result.data.id:", checkoutUrl);
-    } else if (result.data && result.data.orderReference) {
-      const checkoutUrl = `https://checkout.transactpay.ai/?ref=${result.data.orderReference}`;
-      result.data.payment_url = checkoutUrl;
-      console.log("Generated checkout URL from result.data.orderReference:", checkoutUrl);
-    } else if (result.id) {
-      const checkoutUrl = `https://checkout.transactpay.ai/?ref=${result.id}`;
+    let paymentUrl = null;
+
+    if (result.data) {
+      const data = result.data;
+
+      paymentUrl = data.paymentLink
+                || data.payment_link
+                || data.PaymentLink
+                || data.link
+                || data.url
+                || data.paymentUrl
+                || data.payment_url;
+
+      if (!paymentUrl && data.payment) {
+        paymentUrl = data.payment.link
+                  || data.payment.url
+                  || data.payment.paymentLink
+                  || data.payment.checkoutUrl;
+      }
+
+      if (!paymentUrl && data.token) {
+        paymentUrl = `https://payment-link.transactpay.ai/${data.token}`;
+        console.log("Generated payment link from token:", paymentUrl);
+      }
+
+      if (!paymentUrl && data.id) {
+        paymentUrl = `https://payment-link.transactpay.ai/${data.id}`;
+        console.log("Generated payment link from id:", paymentUrl);
+      }
+
+      if (!paymentUrl) {
+        for (const [key, value] of Object.entries(data)) {
+          if (typeof value === 'string' && value.includes('transactpay.ai')) {
+            console.log(`Found TransactPay URL in field "${key}":`, value);
+            paymentUrl = value;
+            break;
+          }
+        }
+      }
+
+      if (!paymentUrl) {
+        for (const [key, value] of Object.entries(data)) {
+          if (typeof value === 'string' && value.startsWith('http')) {
+            console.log(`Found HTTP URL in field "${key}":`, value);
+            paymentUrl = value;
+            break;
+          }
+        }
+      }
+    }
+
+    if (paymentUrl) {
       result.data = result.data || {};
-      result.data.payment_url = checkoutUrl;
-      console.log("Generated checkout URL from result.id:", checkoutUrl);
-    } else if (result.orderReference) {
-      const checkoutUrl = `https://checkout.transactpay.ai/?ref=${result.orderReference}`;
-      result.data = result.data || {};
-      result.data.payment_url = checkoutUrl;
-      console.log("Generated checkout URL from result.orderReference:", checkoutUrl);
+      result.data.payment_url = paymentUrl;
+      console.log("Payment URL found:", paymentUrl);
     } else {
-      console.error("Could not find ID or reference in response to generate checkout URL");
-      console.error("Available fields:", Object.keys(result));
+      console.error("No payment URL found in response");
+      console.error("Available top-level fields:", Object.keys(result));
       if (result.data) {
         console.error("Available data fields:", Object.keys(result.data));
+        console.error("Data values:", JSON.stringify(result.data, null, 2));
       }
     }
 
