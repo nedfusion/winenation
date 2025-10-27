@@ -218,6 +218,14 @@ Deno.serve(async (req: Request) => {
       );
     }
 
+    if (result.data && result.data.payment && result.data.payment.checkoutUrl) {
+      result.data.payment_url = result.data.payment.checkoutUrl;
+    } else if (result.data && result.data.ns) {
+      const checkoutUrl = `https://checkout.transactpay.ai/?ref=${result.data.id}`;
+      result.data.payment_url = checkoutUrl;
+      console.log("Generated checkout URL:", checkoutUrl);
+    }
+
     return new Response(JSON.stringify(result), {
       status: 200,
       headers: {
