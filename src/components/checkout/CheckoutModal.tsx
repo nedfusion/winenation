@@ -169,6 +169,14 @@ export default function CheckoutModal({
       if (result.data) {
         console.log('Available fields in data:', Object.keys(result.data));
         console.log('Data stringified:', JSON.stringify(result.data, null, 2));
+
+        console.log('\n🔍 DETAILED FIELD INSPECTION:');
+        const fields = Object.keys(result.data);
+        fields.forEach((field, index) => {
+          const value = result.data[field];
+          const valueStr = typeof value === 'string' ? value : JSON.stringify(value);
+          console.log(`Field ${index + 1}/${fields.length}: "${field}" = ${valueStr.substring(0, 100)}`);
+        });
       }
       console.log('================================================');
 

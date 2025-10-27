@@ -1,0 +1,94 @@
+═══════════════════════════════════════════════════════════════════
+  TRANSACTPAY FIX - VERSION WITH EXPLICIT FIELD LOGGING
+═══════════════════════════════════════════════════════════════════
+
+I've added code that will show EACH FIELD INDIVIDUALLY in the console!
+
+NEW CONSOLE OUTPUT WILL SHOW:
+
+🔍 DETAILED FIELD INSPECTION:
+Field 1/12: "fieldname1" = value1
+Field 2/12: "fieldname2" = value2
+Field 3/12: "paymentLink" = https://payment-link.transactpay.ai/...
+...and so on for all 12 fields
+
+═══════════════════════════════════════════════════════════════════
+  DEPLOYMENT INSTRUCTIONS
+═══════════════════════════════════════════════════════════════════
+
+STEP 1: DELETE ALL OLD FILES
+   Go to your hosting → Delete EVERYTHING
+
+STEP 2: UPLOAD NEW FILES
+   Extract winenation-website.tar.gz → Upload all files
+   
+   Files to upload:
+   - index.html
+   - WINENATION Logo.jpg  
+   - winenation video.mp4
+   - WhatsApp Video...mp4
+   - assets/index-DfsWL_bN.js (NEW filename!)
+   - assets/index-BC9X9Dao.css
+   - assets/wines-C1PmgyJs.js
+
+STEP 3: CLEAR ALL CACHE
+   Option A - Nuclear Option (RECOMMENDED):
+   1. Close ALL browser windows
+   2. Delete browser cache folder manually:
+      Windows: C:\Users\[Name]\AppData\Local\Google\Chrome\User Data\Default\Cache
+      Mac: ~/Library/Caches/Google/Chrome/Default/Cache
+   3. Restart computer
+   
+   Option B - Browser Clear:
+   1. Ctrl+Shift+Delete
+   2. Select "All time"
+   3. Check ALL boxes
+   4. Clear data
+   5. Close ALL browser windows
+   6. Reopen
+
+STEP 4: TEST WITH CONSOLE OPEN
+   1. Open Console (F12)
+   2. Clear console (click trash icon)
+   3. Test payment
+   4. Look for: "🔍 DETAILED FIELD INSPECTION:"
+   5. Take screenshot showing ALL the "Field 1/12", "Field 2/12", etc lines
+
+═══════════════════════════════════════════════════════════════════
+  WHAT THE NEW CODE DOES
+═══════════════════════════════════════════════════════════════════
+
+The new code loops through ALL 12 fields and prints:
+- Field name in quotes
+- Field value (first 100 characters)
+
+This will show us EXACTLY what TransactPay calls their payment link field!
+
+Example output you'll see:
+Field 1/12: "id" = abc123
+Field 2/12: "reference" = WN-123456
+Field 3/12: "amount" = 33500
+Field 4/12: "CheckoutUrl" = https://payment-link.transactpay.ai/...
+                            ↑↑↑ THIS IS WHAT WE NEED TO SEE! ↑↑↑
+
+Once we see the field names, I can fix it in 1 minute!
+
+═══════════════════════════════════════════════════════════════════
+  WHY THIS WILL WORK
+═══════════════════════════════════════════════════════════════════
+
+1. The logging is in the FRONTEND code (no edge function caching)
+2. New JS filename (index-DfsWL_bN.js) forces browser to reload
+3. Field inspection prints EACH field separately (no collapsed arrays)
+4. Shows first 100 chars of each value (we'll see the full URL)
+
+CACHE MUST BE CLEARED or you'll still see the old version!
+
+═══════════════════════════════════════════════════════════════════
+
+Package: winenation-website.tar.gz (8.4 MB)
+Status: ✅ READY TO DEPLOY
+
+TEST NOW and share console output showing the field inspection!
+
+═══════════════════════════════════════════════════════════════════
