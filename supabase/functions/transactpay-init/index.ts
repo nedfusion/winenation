@@ -218,12 +218,41 @@ Deno.serve(async (req: Request) => {
       );
     }
 
+    console.log("========== RESPONSE STRUCTURE DEBUG ==========");
+    console.log("Full result keys:", Object.keys(result));
+    if (result.data) {
+      console.log("result.data keys:", Object.keys(result.data));
+      console.log("result.data full:", JSON.stringify(result.data, null, 2));
+    }
+    console.log("==============================================");
+
     if (result.data && result.data.payment && result.data.payment.checkoutUrl) {
       result.data.payment_url = result.data.payment.checkoutUrl;
-    } else if (result.data && result.data.ns) {
+      console.log("Found payment URL in result.data.payment.checkoutUrl");
+    } else if (result.data && result.data.id) {
       const checkoutUrl = `https://checkout.transactpay.ai/?ref=${result.data.id}`;
       result.data.payment_url = checkoutUrl;
-      console.log("Generated checkout URL:", checkoutUrl);
+      console.log("Generated checkout URL from result.data.id:", checkoutUrl);
+    } else if (result.data && result.data.orderReference) {
+      const checkoutUrl = `https://checkout.transactpay.ai/?ref=${result.data.orderReference}`;
+      result.data.payment_url = checkoutUrl;
+      console.log("Generated checkout URL from result.data.orderReference:", checkoutUrl);
+    } else if (result.id) {
+      const checkoutUrl = `https://checkout.transactpay.ai/?ref=${result.id}`;
+      result.data = result.data || {};
+      result.data.payment_url = checkoutUrl;
+      console.log("Generated checkout URL from result.id:", checkoutUrl);
+    } else if (result.orderReference) {
+      const checkoutUrl = `https://checkout.transactpay.ai/?ref=${result.orderReference}`;
+      result.data = result.data || {};
+      result.data.payment_url = checkoutUrl;
+      console.log("Generated checkout URL from result.orderReference:", checkoutUrl);
+    } else {
+      console.error("Could not find ID or reference in response to generate checkout URL");
+      console.error("Available fields:", Object.keys(result));
+      if (result.data) {
+        console.error("Available data fields:", Object.keys(result.data));
+      }
     }
 
     return new Response(JSON.stringify(result), {
