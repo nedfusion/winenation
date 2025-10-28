@@ -42,6 +42,7 @@ interface ProductFormModalProps {
 export default function ProductFormModal({ isOpen, onClose, product, onSuccess }: ProductFormModalProps) {
   const [loading, setLoading] = useState(false);
   const [productImages, setProductImages] = useState<ImageData[]>([]);
+  const [categories, setCategories] = useState<Array<{ id: string; name: string }>>([]);
   const [formData, setFormData] = useState({
     name: '',
     category: 'wine',
@@ -61,6 +62,10 @@ export default function ProductFormModal({ isOpen, onClose, product, onSuccess }
     stock_quantity: '0',
     low_stock_threshold: '10'
   });
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
   useEffect(() => {
     if (product) {
@@ -86,6 +91,20 @@ export default function ProductFormModal({ isOpen, onClose, product, onSuccess }
       fetchProductImages(product.id);
     }
   }, [product]);
+
+  const fetchCategories = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('categories')
+        .select('id, name')
+        .order('display_order', { ascending: true });
+
+      if (error) throw error;
+      setCategories(data || []);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
+  };
 
   const fetchProductImages = async (productId: string) => {
     try {
@@ -282,12 +301,22 @@ export default function ProductFormModal({ isOpen, onClose, product, onSuccess }
                 onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
               >
-                <option value="wine">Wine</option>
-                <option value="champagne">Champagne</option>
-                <option value="whisky">Whisky</option>
-                <option value="spirits">Spirits</option>
-                <option value="cognac">Cognac</option>
-                <option value="mixers">Mixers</option>
+                {categories.length > 0 ? (
+                  categories.map((cat) => (
+                    <option key={cat.id} value={cat.name.toLowerCase()}>
+                      {cat.name}
+                    </option>
+                  ))
+                ) : (
+                  <>
+                    <option value="wine">Wine</option>
+                    <option value="champagne">Champagne</option>
+                    <option value="whisky">Whisky</option>
+                    <option value="spirits">Spirits</option>
+                    <option value="cognac">Cognac</option>
+                    <option value="mixers">Mixers</option>
+                  </>
+                )}
               </select>
             </div>
 

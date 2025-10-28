@@ -13,19 +13,26 @@ export default function ProductCard({ wine, onAddToCart }: ProductCardProps) {
     : 0;
 
   return (
-    <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 group">
+    <div className={`bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 group ${!wine.inStock ? 'opacity-75' : ''}`}>
       <div className="relative overflow-hidden">
-        <img 
-          src={wine.image} 
+        <img
+          src={wine.image}
           alt={wine.name}
-          className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+          className={`w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300 ${!wine.inStock ? 'grayscale' : ''}`}
         />
-        {wine.featured && (
+        {!wine.inStock && (
+          <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+            <span className="bg-gray-800 text-white px-4 py-2 rounded-lg text-lg font-bold">
+              OUT OF STOCK
+            </span>
+          </div>
+        )}
+        {wine.featured && wine.inStock && (
           <span className="absolute top-4 left-4 bg-red-600 text-white px-2 py-1 rounded-lg text-sm font-semibold">
             Featured
           </span>
         )}
-        {discountPercentage > 0 && (
+        {discountPercentage > 0 && wine.inStock && (
           <span className="absolute top-4 right-4 bg-green-600 text-white px-2 py-1 rounded-lg text-sm font-semibold">
             -{discountPercentage}%
           </span>
@@ -74,9 +81,13 @@ export default function ProductCard({ wine, onAddToCart }: ProductCardProps) {
           </div>
         </div>
         
-        <button 
+        <button
           onClick={() => onAddToCart(wine)}
-          className="w-full bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center space-x-2"
+          className={`w-full py-2 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2 ${
+            wine.inStock
+              ? 'bg-red-600 text-white hover:bg-red-700'
+              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+          }`}
           disabled={!wine.inStock}
         >
           <ShoppingCart className="h-4 w-4" />

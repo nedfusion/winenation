@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Package, ShoppingBag, TrendingUp, Plus, CreditCard as Edit, Trash2, Eye, PackageCheck, Shield, LogOut, Home } from 'lucide-react';
+import { Users, Package, ShoppingBag, TrendingUp, Plus, CreditCard as Edit, Trash2, Eye, PackageCheck, Shield, LogOut, Home, FolderTree } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAdminRole } from '../../hooks/useAdminRole';
 import { useAuth } from '../../contexts/AuthContext';
@@ -7,6 +7,7 @@ import ProductManager from './ProductManager';
 import UserManager from './UserManager';
 import OrderManager from './OrderManager';
 import StockManager from './StockManager';
+import CategoryManager from './CategoryManager';
 
 interface DashboardStats {
   totalUsers: number;
@@ -75,6 +76,7 @@ export default function AdminDashboard() {
   const availableTabs = [
     { id: 'overview', label: 'Overview', icon: TrendingUp, permission: true },
     { id: 'products', label: 'Products', icon: Package, permission: canManageProducts },
+    { id: 'categories', label: 'Categories', icon: FolderTree, permission: canManageProducts },
     { id: 'stock', label: 'Stock Management', icon: PackageCheck, permission: canManageProducts },
     { id: 'users', label: 'Users', icon: Users, permission: canManageUsers },
     { id: 'orders', label: 'Orders', icon: ShoppingBag, permission: canManageOrders }
@@ -227,6 +229,7 @@ export default function AdminDashboard() {
         )}
 
         {activeTab === 'products' && <ProductManager />}
+        {activeTab === 'categories' && <CategoryManager />}
         {activeTab === 'stock' && <StockManager />}
         {activeTab === 'users' && <UserManager />}
         {activeTab === 'orders' && <OrderManager />}

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Eye, Package, Truck, CheckCircle, XCircle } from 'lucide-react';
+import { Search, Eye, Package, Truck, CheckCircle, XCircle, Trash2 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { useAdminRole } from '../../hooks/useAdminRole';
 
 interface Order {
   id: string;
@@ -34,6 +35,7 @@ export default function OrderManager() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const { role } = useAdminRole();
 
   useEffect(() => {
     fetchOrders();
@@ -74,21 +76,42 @@ export default function OrderManager() {
     try {
       const { error } = await supabase
         .from('orders')
-        .update({ 
-          status: newStatus, 
-          updated_at: new Date().toISOString() 
+        .update({
+          status: newStatus,
+          updated_at: new Date().toISOString()
         })
         .eq('id', orderId);
 
       if (error) throw error;
-      
-      setOrders(orders.map(order => 
-        order.id === orderId 
+
+      setOrders(orders.map(order =>
+        order.id === orderId
           ? { ...order, status: newStatus }
           : order
       ));
     } catch (error) {
       console.error('Error updating order status:', error);
+    }
+  };
+
+  const deleteOrder = async (orderId: string) => {
+    if (!confirm('Are you sure you want to delete this order? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('orders')
+        .delete()
+        .eq('id', orderId);
+
+      if (error) throw error;
+
+      setOrders(orders.filter(order => order.id !== orderId));
+      alert('Order deleted successfully');
+    } catch (error: any) {
+      console.error('Error deleting order:', error);
+      alert('Failed to delete order: ' + error.message);
     }
   };
 
@@ -285,17 +308,28 @@ export default function OrderManager() {
                     {new Date(order.created_at).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <select
-                      value={order.status}
-                      onChange={(e) => updateOrderStatus(order.id, e.target.value)}
-                      className="text-xs border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-red-500"
-                    >
-                      <option value="pending">Pending</option>
-                      <option value="processing">Processing</option>
-                      <option value="shipped">Shipped</option>
-                      <option value="delivered">Delivered</option>
-                      <option value="cancelled">Cancelled</option>
-                    </select>
+                    <div className="flex items-center gap-2">
+                      <select
+                        value={order.status}
+                        onChange={(e) => updateOrderStatus(order.id, e.target.value)}
+                        className="text-xs border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-red-500"
+                      >
+                        <option value="pending">Pending</option>
+                        <option value="processing">Processing</option>
+                        <option value="shipped">Shipped</option>
+                        <option value="delivered">Delivered</option>
+                        <option value="cancelled">Cancelled</option>
+                      </select>
+                      {role === 'super_admin' && (
+                        <button
+                          onClick={() => deleteOrder(order.id)}
+                          className="text-red-600 hover:text-red-700 p-1"
+                          title="Delete order"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}
